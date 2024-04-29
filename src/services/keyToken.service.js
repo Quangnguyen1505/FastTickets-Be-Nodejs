@@ -3,15 +3,17 @@ const db = require('../models');
 class KeyTokenServices {
     static createKeyToken = async ({ userId, publicKey, privateKey, refreshToken }) => {
         try {
-            let tokens;
-            const fitler = { id: userId }, update = {
+            let createToken;
+            const fitler = { user_id: userId }, update = {
                  publicKey, privateKey, refreshTokensUsed: [], refreshToken
             };
-            const foundToken = await db.keyToken.findOne({ where: fitler });
-            if(foundToken){
-                tokens = await db.keyToken.update(update, { where: fitler });
-            }else{
-                tokens = await db.keyToken.create({ ...update, user_id: userId });
+            createToken = await db.keyToken.findOrCreate({
+                where: fitler,
+                defaults: { userId, publicKey, privateKey, refreshToken }
+            });
+
+            if(!createToken[1]){
+                createToken = await db.keyToken.update(update, { where: fitler });
             }
             return tokens ? tokens.publicKey : null
         } catch (error) {
@@ -20,7 +22,15 @@ class KeyTokenServices {
     }
 
     static findByUserId = async ( userId ) => {
-        return await keyTokenModel.findOne({ user: new ObjectId(userId) })
+        return await db.keyToken.findOne({
+            where: {user_id: userId}
+        })
+    }
+
+    static removeToken = async ( keyToken ) => {
+        return await db.keyToken.destroy({
+            where: { id: keyToken}
+        })
     }
 }
 

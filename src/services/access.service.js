@@ -1,10 +1,11 @@
 const { createTokenPair } = require("../auth/authUtils");
-const { BadRequestError, AuthFailureError } = require("../core/error.response");
+const { BadRequestError, AuthFailureError, NotFoundError } = require("../core/error.response");
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const KeyTokenServices = require("./keyToken.service");
 const { getInfoData } = require("../utils");
 const db = require('../models');
+const { findByEmail, findByUserId, updateUserByUserId } = require("../models/repo/accsess");
 
 RoleShop = {
     SHOP:'SHOP',
@@ -22,20 +23,21 @@ class AccessService {
            4. generate token
            5. get data return login
        */
-       //1.
-       const foundShop = await findByEmail({ email });
-       if(!foundShop) throw new BadRequestError('Shop is not registered');
 
-       //2.
-       const match = await bcrypt.compare( password, foundShop.password );
+       const foundUser = await findByEmail({ email });
+       if(!foundUser) throw new BadRequestError('Shop is not registered');
+
+       console.log("foundShop::", foundUser);
+
+       const match = await bcrypt.compare( password, foundUser.password );
        if(!match) throw new AuthFailureError('Authencation error');
 
-       //3.
+
        const privateKey = crypto.randomBytes(64).toString('hex');
        const publicKey = crypto.randomBytes(64).toString('hex');
 
-       //4.
-       const { _id: userId } = foundShop;
+    
+       const { id: userId } = foundUser;
        const tokens = await createTokenPair({ userId, email }, publicKey, privateKey );
        
        await KeyTokenServices.createKeyToken({
@@ -46,27 +48,22 @@ class AccessService {
        })
 
        return {
-           shop: getInfoData({ fileds:['_id', 'name', 'email'], object:foundShop }),
+           shop: getInfoData({ fileds:['id', 'name', 'email'], object:foundUser }),
            tokens
        }
    }
 
    static signUp = async ({ name, email, password, address})=>{
-       // try {
-           
-           // step1: check email exists??
-        //    const user = await db.User.findOrCreate({
-        //         where: {email: email},
-        //         defaults: { name, email, password, address }
-        //    })
+
             const foundUser= await db.User.findOne({
                 where: {email: email},
             })
             if(foundUser){
                 throw new BadRequestError('Error: Shop already registered!');
             }
-            // step2: hash password
-            const passwordHash = await bcrypt.hash(password, 10);
+    
+            const salt = 10;
+            const passwordHash = await bcrypt.hash(password, salt);
 
             const newUser = await db.User.create({ name, email, password: passwordHash, address });
 
@@ -84,7 +81,7 @@ class AccessService {
                if(!keyUser){
                    throw new BadRequestError('Error: keyUser error!');
                }
-               // create token pair
+
                const tokens = await createTokenPair({ userId:newUser.id, email }, publicKey, privateKey );
                console.log("tokens create successfully!", tokens);
 
@@ -97,6 +94,26 @@ class AccessService {
                }
            }
            return null;
+   }
+
+   static logout = async ( keyStore ) => {
+        const delKey = await KeyTokenServices.removeToken(keyStore.id);
+        console.log("delKey", delKey);
+        return delKey;
+   }
+
+   static getProfile = async ( userId )=>{
+        const foundUser = await findByUserId({userId});
+        if(!foundUser) throw new BadRequestError('User is not registered');
+        return foundUser;
+   }
+
+   static updateUser = async ({ userId, payload }) => {
+        const foundUser = await findByUserId({userId}); 
+        if(!foundUser) throw new BadRequestError('User is not registered');
+
+        const updateUser = await updateUserByUserId({userId, payload});
+        return updateUser;
    }
 
 }
