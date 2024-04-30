@@ -1,7 +1,7 @@
 const { SuccessResponse } = require("../core/success.response");
 const AccessService = require("../services/access.service");
 
-class FoodController{
+class AccessController{
     signUp = async ( req, res, next ) => {
         new SuccessResponse({
             message: "create user success",
@@ -24,7 +24,6 @@ class FoodController{
     }
 
     getProfile = async (req,res,next) => {
-        console.log("userId", req.userId);
         new SuccessResponse({
             message: "get profile success",
             metadata: await AccessService.getProfile(req.userId)
@@ -32,7 +31,6 @@ class FoodController{
     }
 
     updateUser = async (req,res,next) => {
-        console.log("userId", req.userId);
         new SuccessResponse({
             message: "update User success",
             metadata: await AccessService.updateUser({ userId: req.userId, payload: req.body})
@@ -56,4 +54,4 @@ class FoodController{
 }
 
 
-module.exports = new FoodController();
+module.exports = new AccessController();
