@@ -27,16 +27,24 @@ module.exports = {
       performer: {
         type: Sequelize.STRING
       },
+      price: {
+        type: Sequelize.ARRAY(Sequelize.JSON),
+        defaultValue: []
+      },
       movie_type: {
         type: Sequelize.ENUM('Hành động', 'Hài', 'Kinh dị', 'Trẻ em'),
         defaultValue: 'Hành động'
       },
       movie_status: {
         type: Sequelize.ENUM('Đang chiếu', 'Sắp chiếu'),
-        defaultValue: 'Đang chiếu'
+        defaultValue: 'Sắp chiếu'
       },
       country: {
         type: Sequelize.STRING
+      },
+      movie_cinemaId_playing: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
+        defaultValue: []
       },
       createdAt: {
         allowNull: false,

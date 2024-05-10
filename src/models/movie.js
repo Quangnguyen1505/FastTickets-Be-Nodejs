@@ -20,8 +20,10 @@ module.exports = (sequelize, DataTypes) => {
     time: DataTypes.STRING,
     director: DataTypes.STRING,
     performer: DataTypes.STRING,
+    price: DataTypes.ARRAY(DataTypes.JSON),
     movie_type: DataTypes.ENUM('Hành động', 'Hài', 'Kinh dị', 'Trẻ em'),
     movie_status: DataTypes.ENUM('Đang chiếu', 'Sắp chiếu'),
+    movie_cinemaId_playing: DataTypes.ARRAY(DataTypes.INTEGER),
     country: DataTypes.STRING
   }, {
     sequelize,
