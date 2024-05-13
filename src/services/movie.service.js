@@ -4,10 +4,10 @@ const db = require('../models');
 class MovieFactory {
     static async createMovie( payload ) {
         const { title, image, content, time, director, 
-                performer, movie_type, movie_status,country } = payload;
+                performer, movie_type, movie_status,country, price = null } = payload;
         
         const newMovie = await db.Movie.create({ title, image, content, time, director, 
-            performer, movie_type, movie_status,country });
+            performer, movie_type, movie_status, country, price });
 
         if(!newMovie) throw new BadRequestError("create Movie error");
 

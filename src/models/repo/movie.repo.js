@@ -10,18 +10,6 @@ const foundMovieById = async ( movieId ) => {
     return foundMovie
 }
 
-// const checkMovieByServer = async ( itemMovie, movieId ) => {
-//     return Promise.all( itemMovie.map( async (product)=>{
-//         const foundMovie = await foundMovieById(movieId);
-//         if(foundMovie){
-//             return {
-//                 price: itemMovie.price,
-//                 quantity: product.quantity,
-//                 productId: product.productId
-//             }
-//         }
-//     }) )
-// }
 
 module.exports = {
     foundMovieById

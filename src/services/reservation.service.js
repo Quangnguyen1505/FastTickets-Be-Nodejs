@@ -1,5 +1,8 @@
 const { NotFoundError, BadRequestError } = require("../core/error.response");
 const { foundMovieById } = require("../models/repo/movie.repo");
+// const { totalPrice } = require("../models/repo/reservation.repo.js");
+const db = require('../models');
+const { SeatPrice } = require("../models/repo/reservation.repo");
 
 class ReservationService {
 
@@ -27,6 +30,12 @@ class ReservationService {
         const foundMovie = await foundMovieById(movieId);
         if(!foundMovie) throw new BadRequestError('Movie not exitst!!');
 
+        const checkDB = await SeatPrice(foundMovie, user_order);
+
+        const checkPriceExists = checkDB.includes(false);
+        if(checkPriceExists) throw new NotFoundError('Price not exists!!');
+        
+
         const checkoutPrice = await user_order.reduce((acc, item) => {
            return acc + item.price  
         },0);
@@ -49,7 +58,7 @@ class ReservationService {
         const newReservation = db.Reservation.create({
             // seats: map------
             total_checkout: checkoutPrice
-        })
+        });
 
         return newReservation
     }
