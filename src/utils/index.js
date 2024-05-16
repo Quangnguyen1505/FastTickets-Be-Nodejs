@@ -6,6 +6,7 @@ const getInfoData = ({ fileds = [], object = {} })=>{
 
 
 
+
 module.exports = {
     getInfoData
 }

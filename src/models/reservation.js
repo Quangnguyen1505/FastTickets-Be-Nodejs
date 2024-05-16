@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Reservation.init({
-    seats: DataTypes.ARRAY(DataTypes.JSON),
+    user_order: DataTypes.ARRAY(DataTypes.JSON),
     movie_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
     address: DataTypes.STRING,

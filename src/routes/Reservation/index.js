@@ -6,7 +6,9 @@ const { authencationV2 } = require('../../auth/authUtils');
 
 router.get("/checkout/:movieId", handlerError(ReservationController.checkoutReservation));
 
-// router.use(authencationV2);
+router.use(authencationV2);
+
+router.post("/create",  handlerError(ReservationController.createReservation));
 
 
 

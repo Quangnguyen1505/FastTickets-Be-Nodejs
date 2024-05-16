@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      seats: {
+      user_order: {
         type: Sequelize.ARRAY(Sequelize.JSON),
         defaultValue: []
       },

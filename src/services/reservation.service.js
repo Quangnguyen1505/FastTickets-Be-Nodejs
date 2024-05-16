@@ -2,7 +2,7 @@ const { NotFoundError, BadRequestError } = require("../core/error.response");
 const { foundMovieById } = require("../models/repo/movie.repo");
 // const { totalPrice } = require("../models/repo/reservation.repo.js");
 const db = require('../models');
-const { SeatPrice } = require("../models/repo/reservation.repo");
+const { SeatPrice, foundReservationById } = require("../models/repo/reservation.repo");
 
 class ReservationService {
 
@@ -20,9 +20,9 @@ class ReservationService {
     //     }
     // ]
     //
-    static async checkoutReviewReservation( movieId, payload ) {
+    static async checkoutReviewReservation({ movieId, payload }) {
         const {
-            user_order, address = "Xo viet nghe tinh"
+            user_order, address = ""
         } = payload;
    
         if(!user_order) throw new NotFoundError('Varible invalid!!');
@@ -49,26 +49,43 @@ class ReservationService {
 
     }
 
-    static async createReservation({ user_order, movieId }) {        
+    static async createReservation({ userId, payload }) { 
+        const { movieId, user_order, address_order } = payload;      
+
         const { checkoutPrice, address } = await ReservationService.checkoutReviewReservation({
-            user_order
-        })
+            movieId, payload: {
+                user_order,
+                address: address_order
+            }
+        });
         if(!checkoutPrice) throw new NotFoundError("checkout price not exists!!");
 
+        const seats = await user_order.map( item => item.seat );
         const newReservation = db.Reservation.create({
-            // seats: map------
-            total_checkout: checkoutPrice
+            user_id: userId,
+            movie_id: movieId,
+            address: address,
+            total_checkout: checkoutPrice,
+            user_order
         });
 
         return newReservation
     }
 
     static async getReservationById( reservationId ) {
+        const foundReservation = await foundReservationById(reservationId);
+        if(!foundReservation) throw new BadRequestError("Reservation not exitst!!");
 
+        return foundReservation;
     }
 
-    static async getReservations() {
+    static async getReservations({ limit = 50, sort = 'ctime', page = 1 }) {
+        const foudAllReservations = await foundAllReser({ limit, sort, page, 
+            unselect: ['createAt', 'updatedAt'] 
+        });
+        if(!foudAllReservations.length) throw new BadRequestError("Reservation not exitst");
 
+        return foudAllReservations;
     }
 
     static async destroyReservation( reservationId ) {}
