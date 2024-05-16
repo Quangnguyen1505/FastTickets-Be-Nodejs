@@ -23,8 +23,12 @@ const foundAllReser = async ({ limit, sort, page, unselect }) => {
     const sortBy = sort == 'ctime' ? {_id: -1} : {_id: 1};
     const foundReservations = await db.Reservation.findAll({
         attributes: {exclude: unselect},
-        limit
+        limit,
+        skip,
+        sort: sortBy
     });
+
+    return foundReservations;
 } 
 
 module.exports = {

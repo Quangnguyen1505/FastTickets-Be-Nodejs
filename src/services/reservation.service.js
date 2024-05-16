@@ -2,7 +2,7 @@ const { NotFoundError, BadRequestError } = require("../core/error.response");
 const { foundMovieById } = require("../models/repo/movie.repo");
 // const { totalPrice } = require("../models/repo/reservation.repo.js");
 const db = require('../models');
-const { SeatPrice, foundReservationById } = require("../models/repo/reservation.repo");
+const { SeatPrice, foundReservationById, foundAllReser } = require("../models/repo/reservation.repo");
 
 class ReservationService {
 
@@ -81,7 +81,7 @@ class ReservationService {
 
     static async getReservations({ limit = 50, sort = 'ctime', page = 1 }) {
         const foudAllReservations = await foundAllReser({ limit, sort, page, 
-            unselect: ['createAt', 'updatedAt'] 
+            unselect: ['createdAt', 'updatedAt'] 
         });
         if(!foudAllReservations.length) throw new BadRequestError("Reservation not exitst");
 

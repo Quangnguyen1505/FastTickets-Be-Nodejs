@@ -15,6 +15,20 @@ class ReservationController{
             metadata: await reservationService.createReservation({ userId: req.user.userId, payload: req.body })
         }).send(res);
     }
+
+    getReservation = async ( req, res, next ) => {
+        new SuccessResponse({
+            message: "get Reservation success",
+            metadata: await reservationService.getReservationById(req.params.id)
+        }).send(res);
+    }
+
+    getAllReservation = async ( req, res, next ) => {
+        new SuccessResponse({
+            message: "get All Reservation success",
+            metadata: await reservationService.getReservations(req.query)
+        }).send(res);
+    }
 }
 
 
