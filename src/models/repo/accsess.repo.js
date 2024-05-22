@@ -1,4 +1,4 @@
-const db = require('../../models');
+const db = require('..');
 
 const findByEmail = async ({ email, select = [
     "id", "email", "password", "name"

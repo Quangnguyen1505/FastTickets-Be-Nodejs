@@ -8,8 +8,15 @@ const foundCinameById = async ( cinemaId ) => {
     return foundSeat;
 }
 
-const foundAllCinema = async () => {
-    const foundSeats = await db.Cinema.findAll();
+const foundAllCinema = async ({ limit, sort, page, unselect }) => {
+    const skip = ( page - 1 ) * limit;
+    const sortBy = sort == 'ctime' ? {_id: -1} : {_id: 1};
+    const foundSeats = await db.Cinema.findAll({
+        attributes: {exclude: unselect},
+        limit,
+        sort: sortBy,
+        skip
+    });
 
     return foundSeats;
 }

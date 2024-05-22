@@ -79,7 +79,7 @@ class ReservationService {
         return foundReservation;
     }
 
-    static async getReservations({ limit = 50, sort = 'ctime', page = 1 }) {
+    static async getReservations({ limit = 30, sort = 'ctime', page = 1 }) {
         const foudAllReservations = await foundAllReser({ limit, sort, page, 
             unselect: ['createdAt', 'updatedAt'] 
         });

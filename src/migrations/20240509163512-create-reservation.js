@@ -5,23 +5,24 @@ module.exports = {
     await queryInterface.createTable('Reservations', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        autoIncrement: false,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.literal("gen_random_uuid()"),
       },
       user_order: {
         type: Sequelize.ARRAY(Sequelize.JSON),
         defaultValue: []
       },
       movie_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
           model: 'Movies',
           key: 'id'
         }
       },
       user_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
           model: 'Users',
           key: 'id'

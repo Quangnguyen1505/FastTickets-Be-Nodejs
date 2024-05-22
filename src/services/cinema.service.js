@@ -26,10 +26,10 @@ const { foundMovieById } = require('../models/repo/movie.repo');
 class CinemaService{
     static async createCinema( payload ){
         const {
-            cinema_name, cinema_seat, movie_playing
+            cinema_name, cinema_seat, movie_playing 
         } = payload;
         console.log("payload ", payload);
-        if(!cinema_name || !cinema_seat || !movie_playing ) throw new NotFoundError('varible invalid!!');
+        if(!cinema_name || !cinema_seat ) throw new NotFoundError('varible invalid!!');
         
         const newCinema = await db.Cinema.create({
             cinema_name, cinema_seat, movie_playing
@@ -55,8 +55,9 @@ class CinemaService{
         };
     }
 
-    static async getAllCinema (){
-        const foundSeats = await foundAllCinema();
+    static async getAllCinema ({ limit = 30, sort = 'ctime', page = 1  }){
+        const foundSeats = await foundAllCinema({ limit, sort, page,
+            unselect: ['createdAt'] });
         if(!foundSeats.length) throw new BadRequestError('Cinema length not exists!!');
 
         return foundSeats;

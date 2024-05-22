@@ -2,33 +2,32 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('keyTokens', {
+    await queryInterface.createTable('Events', {
       id: {
         allowNull: false,
         autoIncrement: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: Sequelize.literal("gen_random_uuid()"),
+        defaultValue: Sequelize.literal("gen_random_uuid()")
       },
-      user_id: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'Users',
-          key: 'id'
-        }
-      },
-      privateKey: {
+      title: {
         type: Sequelize.STRING
       },
-      publicKey: {
+      description: {
         type: Sequelize.STRING
       },
-      refreshToken: {
+      status: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      image: {
         type: Sequelize.STRING
       },
-      refreshTokensUsed: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-        defaultValue: []
+      event_start: {
+        type: Sequelize.DATE
+      },
+      event_end: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -41,6 +40,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('keyTokens');
+    await queryInterface.dropTable('Events');
   }
 };

@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const KeyTokenServices = require("./keyToken.service");
 const { getInfoData } = require("../utils");
 const db = require('../models');
-const { findByEmail, findByUserId, updateUserByUserId } = require("../models/repo/accsess");
+const { findByEmail, findByUserId, updateUserByUserId } = require("../models/repo/accsess.repo");
 
 RoleShop = {
     SHOP:'SHOP',
