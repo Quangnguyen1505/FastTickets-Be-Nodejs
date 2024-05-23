@@ -12,4 +12,4 @@ router.use(authencationV2);
 router.post("/create", handlerError(MovieController.createMovie));
 router.post("/update", handlerError(MovieController.updateMovie));
 
-module.exports = router
+module.exports = router;

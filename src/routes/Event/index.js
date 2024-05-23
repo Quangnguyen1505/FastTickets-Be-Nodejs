@@ -11,4 +11,4 @@ router.use(authencationV2);
 
 router.post("/create", handlerError(eventController.createEvent));
 
-module.exports = router
+module.exports = router;

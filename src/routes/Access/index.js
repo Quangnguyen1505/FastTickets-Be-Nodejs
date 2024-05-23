@@ -12,4 +12,4 @@ router.get("/profile", handlerError(AccessController.getProfile));
 router.post("/logout", handlerError(AccessController.logout));
 router.post("/update", handlerError(AccessController.updateUser));
 
-module.exports = router
+module.exports = router;

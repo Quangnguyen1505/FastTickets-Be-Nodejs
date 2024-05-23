@@ -6,5 +6,6 @@ router.use('/v1/api/event', require('./Event'));
 router.use('/v1/api/movie', require('./Movie'));
 router.use('/v1/api/cinema', require('./Cinema'));
 router.use('/v1/api/reservation', require('./Reservation'));
+router.use('/v1/api/upload', require('./upload'));
 
 module.exports = router
