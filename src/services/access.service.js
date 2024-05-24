@@ -6,6 +6,7 @@ const KeyTokenServices = require("./keyToken.service");
 const { getInfoData } = require("../utils");
 const db = require('../models');
 const { findByEmail, findByUserId, updateUserByUserId } = require("../models/repo/accsess.repo");
+const userValidate = require("../helper/validation");
 
 RoleShop = {
     SHOP:'SHOP',
@@ -54,7 +55,9 @@ class AccessService {
    }
 
    static signUp = async ({ name, email, password, address})=>{
-
+            const { error } = userValidate({ email, password });
+            if( error ) throw new NotFoundError(error.details[0].message);
+            
             const foundUser= await db.User.findOne({
                 where: {email: email},
             })
