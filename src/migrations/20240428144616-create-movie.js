@@ -29,8 +29,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       price: {
-        type: Sequelize.ARRAY(Sequelize.JSON),
-        defaultValue: []
+        type: Sequelize.STRING
       },
       movie_type: {
         type: Sequelize.ENUM('Hành động', 'Hài', 'Kinh dị', 'Trẻ em'),
@@ -42,10 +41,6 @@ module.exports = {
       },
       country: {
         type: Sequelize.STRING
-      },
-      movie_cinemaId_playing: {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
-        defaultValue: []
       },
       createdAt: {
         allowNull: false,
