@@ -10,6 +10,7 @@ router.get("/findOne/:roomId", handlerError(roomController.getRoomById));
 router.use(authencationV2);
 
 router.post("/create", handlerError(roomController.createRoom));
+router.post("/insert/movie", handlerError(roomController.insertMovieToRoom));
 // router.post("/update", handlerError(MovieController.updateMovie));
 
 module.exports = router;

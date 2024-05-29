@@ -17,6 +17,13 @@ class RoomController{
     //     }).send(res);
     // } 
 
+    insertMovieToRoom = async ( req, res, next ) => {
+        new SuccessResponse({
+            message: "Insert movie to Room success",
+            metadata: await roomService.insertMovieToRoom(req.body)
+        }).send(res);
+    } 
+
     getRoomById = async (req,res,next) => {
         new SuccessResponse({
             message: "get Room by Id success",

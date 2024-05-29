@@ -21,7 +21,19 @@ const foundAllRoom = async ({ limit, sort, page, unselect }) => {
     return foundRoom;
 }
 
+const updateMovieToRoom = async ( roomId, movieId, movieUsed ) => {
+    const newRoom = await db.Room.update({
+        room_currently_showing: movieId,
+        room_previously_shown: movieUsed
+    }, {
+        where: {id: roomId}
+    });
+
+    return newRoom;
+}
+
 module.exports = {
     foundRoomById,
-    foundAllRoom
+    foundAllRoom,
+    updateMovieToRoom
 }

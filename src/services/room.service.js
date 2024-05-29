@@ -1,6 +1,6 @@
 const { BadRequestError, NotFoundError } = require('../core/error.response');
 const db = require('../models');
-const { foundRoomById, foundAllRoom } = require('../models/repo/room.repo');
+const { foundRoomById, foundAllRoom, updateMovieToRoom } = require('../models/repo/room.repo');
 const { foundMovieById } = require('../models/repo/movie.repo');
 const { createSeat } = require('./seat.service');
 
@@ -20,9 +20,7 @@ const { createSeat } = require('./seat.service');
 //         "quantity": 5
 //     }
 // ],
-// movie_playing: [
-//     1,2,3,4
-// ]
+
 
 class RoomService{
     static async createRoom( payload ){
@@ -46,6 +44,35 @@ class RoomService{
         if(!newRoom) throw new BadRequestError('New Room failed!!');
 
         await createSeat({ roomId: newRoom.id, seats: newRoom.room_seat });
+
+        return newRoom;
+    }
+
+    static async insertMovieToRoom( payload ){
+        const { roomId, movieId } = payload;
+        if(!roomId || !movieId) throw new NotFoundError('roomId or movieId invalid!!');
+
+        const foundRoom = await foundRoomById(roomId);
+        if(!foundRoom) throw new BadRequestError('Room not exists!');
+
+        const foundMovie = await foundMovieById(movieId);
+        if(!foundMovie) throw new BadRequestError('Movie not exists!');
+
+        if(foundRoom.room_currently_showing == movieId) throw new BadRequestError('Movie already exists!');
+
+        if(foundRoom.room_previously_shown.map(item => item.movieId).includes(movieId)) throw new BadRequestError('Movies cannot be shown again!');
+        let movieUsed = [{
+            movieId: foundRoom.room_currently_showing,
+            Date_Show: foundRoom.room_release_date
+        }];
+
+        if(foundRoom.room_previously_shown != null){
+            let previouslyShown = foundRoom.room_previously_shown;
+            movieUsed.push(previouslyShown);
+            movieUsed = movieUsed.flat();
+        }
+          
+        const newRoom = await updateMovieToRoom(foundRoom.id, movieId, movieUsed);
 
         return newRoom;
     }
