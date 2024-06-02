@@ -49,7 +49,7 @@ class RoomService{
     }
 
     static async insertMovieToRoom( payload ){
-        const { roomId, movieId } = payload;
+        const { roomId, movieId, release_date } = payload;
         if(!roomId || !movieId) throw new NotFoundError('roomId or movieId invalid!!');
 
         const foundRoom = await foundRoomById(roomId);
@@ -58,21 +58,25 @@ class RoomService{
         const foundMovie = await foundMovieById(movieId);
         if(!foundMovie) throw new BadRequestError('Movie not exists!');
 
+        const dateMovieUsed = new Date(foundRoom.room_release_date).toJSON().slice(0,10);
+        const dateMovieNow = new Date(release_date).toJSON().slice(0,10);
+        if(dateMovieUsed == dateMovieNow) throw new BadRequestError('Movies currently showing cannot be added!');
+
         if(foundRoom.room_currently_showing == movieId) throw new BadRequestError('Movie already exists!');
 
-        if(foundRoom.room_previously_shown.map(item => item.movieId).includes(movieId)) throw new BadRequestError('Movies cannot be shown again!');
         let movieUsed = [{
             movieId: foundRoom.room_currently_showing,
             Date_Show: foundRoom.room_release_date
         }];
 
         if(foundRoom.room_previously_shown != null){
+            if(foundRoom.room_previously_shown.map(item => item.movieId).includes(movieId)) throw new BadRequestError('Movies cannot be shown again!');
             let previouslyShown = foundRoom.room_previously_shown;
             movieUsed.push(previouslyShown);
             movieUsed = movieUsed.flat();
         }
           
-        const newRoom = await updateMovieToRoom(foundRoom.id, movieId, movieUsed);
+        const newRoom = await updateMovieToRoom(foundRoom.id, movieId, dateMovieNow, movieUsed);
 
         return newRoom;
     }
