@@ -20,6 +20,9 @@ app.use(cors());
 //init db
 dbconn();
 
+//init passport
+require('./config/passportAuth.config');
+
 //init routes
 app.use('/', require('./routes'))
 

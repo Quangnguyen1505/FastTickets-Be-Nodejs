@@ -42,6 +42,23 @@ class UploadService {
 
         return uploadedUrls;
     }
+
+    static async uploadTrailer({ path, folderName = 'Cinema/trailer' }){
+        console.log("path::", path);
+        const result = await cloudinary.uploader.upload(path, 
+            { 
+                public_id: `${Date.now()}`,
+                folder: folderName,
+                resource_type: 'video'
+            }
+        );
+
+        return {
+            video_url: result.secure_url,
+            item_video: 'video-trailer',
+            thumb_url: cloudinary.url( result.public_id)
+        }
+    }
 }
 
 module.exports = UploadService;
