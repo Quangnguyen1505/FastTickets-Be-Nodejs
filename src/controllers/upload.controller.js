@@ -20,6 +20,15 @@ class UploadController{
             metadata: await uploadService.uploadManyImageFromLocal({ files: files })
         }).send(res);
     }
+
+    uploadVideoTrailer = async ( req, res, next ) => {
+        const file = req.file.path;
+        if(!file) throw new NotFoundError("No file found");
+        new SuccessResponse({
+            message: "upload video success",
+            metadata: await uploadService.uploadTrailer({ path: file })
+        }).send(res);
+    }
 }
 
 

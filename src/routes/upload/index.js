@@ -8,5 +8,6 @@ router.use(authencationV2);
 
 router.post('/thumb', uploadDisk.single('file'), uploadController.uploadImage);
 router.post('/thumb/images', uploadDisk.array('files', 10), uploadController.uploadManyImage);
+router.post('/video', uploadDisk.single('file'), uploadController.uploadVideoTrailer);
 
 module.exports = router;
