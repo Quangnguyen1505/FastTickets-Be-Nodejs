@@ -27,7 +27,15 @@ class MovieController{
     getAllMovie = async (req,res,next) => {
         new SuccessResponse({
             message: "get all movie success",
-            metadata: await MovieService.getMovies()
+            metadata: await MovieService.getMovies(req.query)
+        }).send(res);
+    }
+
+    searchMovieByTitle = async (req,res,next) => {
+        const movie_title = req.params.title;
+        new SuccessResponse({
+            message: "search movie success",
+            metadata: await MovieService.searchMovie(movie_title)
         }).send(res);
     }
 }

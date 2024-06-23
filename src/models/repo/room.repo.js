@@ -2,7 +2,12 @@ const db = require('..');
 
 const foundRoomById = async ( roomId ) => {
     const foundRoom = await db.Room.findOne({
-        where: {id: roomId}
+        where: {id: roomId},
+        include: [{
+            model: db.Movie,
+            as: 'Movie', 
+            attributes: ['title', 'movie_status']
+        }],
     });
 
     return foundRoom;

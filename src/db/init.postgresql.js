@@ -7,7 +7,9 @@ const { PG_HOST, PG_USER, PG_PASSWORD, PG_DATABASE, PG_DIALECT } = process.env;
 const sequelize = new Sequelize(PG_DATABASE, PG_USER, PG_PASSWORD, {
     host: PG_HOST,
     dialect: PG_DIALECT,
-    logging: false,
+    logging: (msg) => {
+      console.log(`Sequelize log: ${msg}`); // Log thông tin của Sequelize
+  },
     timezone: '+07:00'
 });
 

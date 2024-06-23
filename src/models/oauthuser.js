@@ -18,11 +18,12 @@ module.exports = (sequelize, DataTypes) => {
     oauth_dateOfBirth: DataTypes.DATE,
     oauth_sex: DataTypes.STRING,
     oauth_email: DataTypes.STRING,
-    oauth_address: DataTypes.STRING,
     oauth_avatarUrl: DataTypes.STRING,
     oauth_role: DataTypes.ARRAY(DataTypes.STRING),
     oauth_type: DataTypes.STRING,
-    oauth_token: DataTypes.STRING,
+    oauth_hash_confirm: DataTypes.STRING,
+    oauth_publickey: DataTypes.STRING,
+    oauth_token: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'OauthUser',

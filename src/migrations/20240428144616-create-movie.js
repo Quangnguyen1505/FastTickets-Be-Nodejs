@@ -51,6 +51,8 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    //define index
+    await queryInterface.addIndex('Movies', ['title']);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Movies');

@@ -12,8 +12,8 @@ passport.use(new GoogleStrategy({
   },
   function(accessToken, refreshToken, profile, cb) {
     console.log("profile", profile);
-    const oauth_token = uuidv4();
-    profile.oauth_token = oauth_token;
+    const oauth_hash_confirm = uuidv4();
+    profile.oauth_hash_confirm = oauth_hash_confirm;
     let response = db.OauthUser.findOrCreate({ 
       where: {id: profile.id},
       defaults: {
@@ -22,13 +22,13 @@ passport.use(new GoogleStrategy({
         oauth_type: profile?.provider,
         oauth_fullname: profile?.displayName,
         oauth_avatarUrl: profile?.photos[0]?.value,
-        oauth_token
+        oauth_hash_confirm
       } 
     });
 
     if(!response[1]) {
       db.OauthUser.update(
-        { oauth_token }, 
+        { oauth_hash_confirm }, 
         { where: { 
             id: profile.id 
         } 

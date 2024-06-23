@@ -1,5 +1,6 @@
 const { BadRequestError } = require('../core/error.response');
 const db = require('../models');
+const { searchMovie } = require('../models/repo/movie.repo');
 
 class MovieFactory {
     static async createMovie( payload ) {
@@ -43,6 +44,11 @@ class MovieFactory {
         });
 
         return updateMovie;
+    }
+
+    static async searchMovie(movie_title) {
+        const foundMovie = await searchMovie(movie_title);
+        return foundMovie;
     }
 }
 

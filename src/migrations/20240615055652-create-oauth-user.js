@@ -22,10 +22,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      oauth_address: {
-        type: Sequelize.STRING,
-        defaultValue: ''
-      },
       oauth_avatarUrl: {
         type: Sequelize.STRING,
         defaultValue: ''
@@ -35,6 +31,12 @@ module.exports = {
         defaultValue: ['USER']
       },
       oauth_type: {
+        type: Sequelize.STRING
+      },
+      oauth_hash_confirm: {
+        type: Sequelize.STRING
+      },
+      oauth_publickey: {
         type: Sequelize.STRING
       },
       oauth_token: {

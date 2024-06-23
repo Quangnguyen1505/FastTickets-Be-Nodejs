@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Movie.hasMany(models.Room, { foreignKey: 'room_currently_showing' });
     }
   }
   Movie.init({
@@ -27,6 +28,12 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Movie',
+    indexes: [
+      {
+        unique: false,
+        fields: ['title']
+      }
+    ]
   });
   return Movie;
 };

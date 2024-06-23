@@ -6,6 +6,7 @@ const { authencationV2 } = require('../../auth/authUtils');
 
 router.get("/findAll", handlerError(MovieController.getAllMovie));
 router.get("/findOne/:id", handlerError(MovieController.getMovieById));
+router.get("/search/:title", handlerError(MovieController.searchMovieByTitle));
 
 router.use(authencationV2);
 
