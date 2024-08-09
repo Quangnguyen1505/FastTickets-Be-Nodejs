@@ -6,6 +6,7 @@ var helmet =require('helmet');
 var compression = require('compression')
 const cors = require('cors');
 const dbconn = require('./db/init.postgresql');
+const cookieParser = require('cookie-parser')
 
 //init middelwares
 app.use(morgan("dev"));
@@ -15,7 +16,11 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }))
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:4200', 
+    credentials: true 
+}));
+app.use(cookieParser());
 
 //init db
 dbconn();

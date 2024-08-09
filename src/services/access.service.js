@@ -17,6 +17,7 @@ RoleShop = {
 
 class AccessService {
     static login = async ({ email, password, refreshToken = null })=>{
+        console.log("login::", { email, password, refreshToken });
         /*
            1. Check email in dbs
            2. match password
@@ -89,11 +90,8 @@ class AccessService {
                console.log("tokens create successfully!", tokens);
 
                return {
-                   code: 201,
-                   metadata: {
-                       shop: getInfoData({ fileds:['_id', 'name', 'email'], object:newUser }),
-                       tokens
-                   }
+                    shop: getInfoData({ fileds:['id', 'name', 'email'], object:newUser }),
+                    tokens
                }
            }
            return null;

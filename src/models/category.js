@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class keyToken extends Model {
+  class category extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,17 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      category.hasMany(models.Movie, { foreignKey: 'movie_categoryId' });
     }
   }
-  keyToken.init({
-    user_id: DataTypes.UUID,
-    privateKey: DataTypes.STRING,
-    publicKey: DataTypes.STRING,
-    refreshToken: DataTypes.STRING,
-    refreshTokensUsed: DataTypes.ARRAY(DataTypes.STRING)
+  category.init({
+    cate_name: DataTypes.STRING,
+    cate_slug: DataTypes.STRING,
+    cate_description: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'keyToken',
+    modelName: 'category',
   });
-  return keyToken;
+  return category;
 };

@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Movie.hasMany(models.Room, { foreignKey: 'room_currently_showing' });
+      Movie.belongsTo(models.category, { foreignKey: 'movie_categoryId' });
     }
   }
   Movie.init({
@@ -22,8 +23,8 @@ module.exports = (sequelize, DataTypes) => {
     director: DataTypes.STRING,
     performer: DataTypes.STRING,
     price: DataTypes.STRING,
-    movie_type: DataTypes.ENUM('Hành động', 'Hài', 'Kinh dị', 'Trẻ em'),
-    movie_status: DataTypes.ENUM('Đang chiếu', 'Sắp chiếu'),
+    movie_categoryId: DataTypes.UUID,
+    movie_status: DataTypes.ENUM('Now Showing', 'Coming Soon', 'Previously Shown'),
     country: DataTypes.STRING
   }, {
     sequelize,

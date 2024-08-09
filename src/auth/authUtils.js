@@ -1,6 +1,5 @@
 const JWT = require('jsonwebtoken');
 const asyncHandler = require('../helper/asyncHandler')
-const db = require('../models');
 const { findByUserId } = require('../services/keyToken.service');
 const { AuthFailureError, NotFoundError } = require('../core/error.response');
 const HEADER = {
@@ -11,7 +10,7 @@ const HEADER = {
 }
 const createTokenPair = async ( payload, publicKey, privateKey )=>{
     try {
-        const asscessToken = JWT.sign( payload, publicKey, {
+        const accessToken = JWT.sign( payload, publicKey, {
             // algorithm: 'RS256',
             expiresIn: '2 days'
         });
@@ -21,15 +20,15 @@ const createTokenPair = async ( payload, publicKey, privateKey )=>{
             expiresIn: '7 days'
         });
 
-        JWT.verify( asscessToken, publicKey, ( err, decode )=>{
+        JWT.verify( accessToken, publicKey, ( err, decode )=>{
             if(err){
-                console.log("asscessToken verify error",err);
+                console.log("accessToken verify error",err);
             }else{
-                console.log("asscessToken verify successfully! ",decode);
+                console.log("accessToken verify successfully! ",decode);
             }
         });
 
-        return {asscessToken,refreshToken};
+        return {accessToken,refreshToken};
 
     } catch (error) {
         return error
@@ -45,13 +44,17 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
       5. Check key Store with this userId
       6. OK all => return next()
     */
-    const userId = req.headers[HEADER.CLIENT_ID];
-    if( !userId ) throw new AuthFailureError('Invalid Request');
+    // const userId = req.headers[HEADER.CLIENT_ID];
+    const userId = req.cookies[HEADER.CLIENT_ID];
+    // if( !userId ) throw new AuthFailureError('Invalid Request');
+    console.log("userId", userId);
+    if( !userId ) return;
     
     const keyStore = await findByUserId(userId);
     console.log("keyStore::", keyStore);
     if(!keyStore) throw new NotFoundError('Not Found keyStore');
-    const refreshToken = req.headers[HEADER.REFRESHTOKEN];
+    // const refreshToken = req.headers[HEADER.REFRESHTOKEN];
+    const refreshToken = req.cookies[HEADER.REFRESHTOKEN];
     if(refreshToken){
         try {
 
@@ -69,12 +72,12 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
         }
     }
 
-    const accessToken = req.headers[HEADER.AUTHORIZATION];
+    const accessToken = req.cookies[HEADER.AUTHORIZATION];
     if( !accessToken ) throw new AuthFailureError('Invalid Request');
-    const extractedToken = accessToken.split(' ')[1]; // bearer
+    // const extractedToken = accessToken.split(' ')[1]; // bearer
     try {
 
-        const decodeUser = JWT.verify( extractedToken, keyStore.publicKey );
+        const decodeUser = JWT.verify( accessToken, keyStore.publicKey );
         console.log("decode::", decodeUser);
         
         if( userId != decodeUser.userId ) throw new AuthFailureError('Invalid UserId');

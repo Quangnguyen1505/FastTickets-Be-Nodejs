@@ -31,13 +31,15 @@ module.exports = {
       price: {
         type: Sequelize.STRING
       },
-      movie_type: {
-        type: Sequelize.ENUM('Hành động', 'Hài', 'Kinh dị', 'Trẻ em'),
-        defaultValue: 'Hành động'
+      movie_categoryId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'categories',
+          key: 'id'
+        }
       },
       movie_status: {
-        type: Sequelize.ENUM('Đang chiếu', 'Sắp chiếu'),
-        defaultValue: 'Sắp chiếu'
+        type: Sequelize.ENUM('Now Showing', 'Coming Soon', 'Previously Shown')
       },
       country: {
         type: Sequelize.STRING
