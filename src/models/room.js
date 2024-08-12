@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Room.init({
     room_name: DataTypes.STRING,
-    room_seat: DataTypes.ARRAY(DataTypes.JSONB),
+    room_seat_quantity: DataTypes.INTEGER,
+    room_seat_type: DataTypes.ARRAY(DataTypes.STRING),
     room_status: DataTypes.BOOLEAN,
     room_currently_showing: DataTypes.UUID,
     room_previously_shown: DataTypes.ARRAY(DataTypes.JSON),

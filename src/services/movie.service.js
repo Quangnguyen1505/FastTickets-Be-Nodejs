@@ -26,7 +26,17 @@ class MovieFactory {
         })
     }
 
-    static async getMovies({ limit = 30, sort = 'ctime', page = 1, movie_status }) {
+    static async getMovies({ limit = 30, sort = 'ctime', page = 1 }) {
+        const skip = ( page - 1 ) * limit;
+        const sortBy = sort == 'ctime' ? {_id: -1} : {_id: 1};
+        return await db.Movie.findAll({
+            limit,
+            sort: sortBy,
+            skip
+        });
+    }
+
+    static async getMoviesByStatus({ limit = 30, sort = 'ctime', page = 1, movie_status }) {
         const skip = ( page - 1 ) * limit;
         const sortBy = sort == 'ctime' ? {_id: -1} : {_id: 1};
         return await db.Movie.findAll({

@@ -13,8 +13,11 @@ module.exports = {
       room_name: {
         type: Sequelize.STRING
       },
-      room_seat: {
-        type: Sequelize.ARRAY(Sequelize.JSONB)
+      room_seat_quantity: {
+        type: Sequelize.INTEGER
+      },
+      room_seat_type: {
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       room_status: {
         type: Sequelize.BOOLEAN,

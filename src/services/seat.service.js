@@ -6,11 +6,11 @@ class SeatService {
     static async createSeat(payload){
         if(!payload) throw new BadRequestError('Payload not exitst!!');
         const {
-            roomId, seats
+            seat_row, seat_type, seat_number, seat_roomId
         } = payload;
         
         const newSeat = await db.Seat.create({
-            id: roomId, seat_normal: seats[0], seat_vip: seats[1], seat_couple: seats[2]
+            seat_row, seat_type, seat_number, seat_roomId
         });
         if(!newSeat) throw new BadRequestError("create failed!!");
 
