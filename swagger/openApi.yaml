@@ -1,0 +1,165 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description: |-
+    **This is a sample Pet Store Server based on the OpenAPI 3.0 specification**.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+    That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+
+    _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+    
+    Some useful links:
+    - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: quang0706r@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8000/v1/api
+    description: Development server
+tags:
+  - name: User
+    description: Everything related to user management
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+paths:
+  /access/login:
+    post:
+      tags:
+        - User
+      summary: Logs user into the system
+      description: 'Login into the system with email and password'
+      operationId: login
+      requestBody:
+        description: Login user in the cinema
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'login user success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    $ref: '#/components/schemas/LoginResponseMetadata'
+  
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+  /access/profile:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      description: 'Get user profile'
+      operationId: getProfile
+      security:
+        - cookieClientId: []
+        - cookieAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get profile success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    $ref: '#/components/schemas/ProfileUser'
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+components:
+  schemas:
+    LoginBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: "hieu22@gmail.com"
+        password:
+          type: string
+          example: "1223"
+    LoginResponseMetadata:
+      type: object
+      properties:
+        shop: 
+          type: object
+          properties:
+            id: 
+              type: string
+              example: "5080bb7a-7aff-433a-a724-9f6ec36f48be"
+            name:
+              type: string
+              example: "hIEU"
+            email:
+              type: string
+              example: "hieu22@gmail.com"
+        tokens:
+          type: object
+          properties:
+            accessToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDgwYmI3YS03YWZmLTQzM2EtYTcyNC05ZjZlYzM2ZjQ4YmUiLCJlbWFpbCI6ImhpZXUyMkBnbWFpbC5jb20iLCJpYXQiOjE3MjY2NDg0NDYsImV4cCI6MTcyNjgyMTI0Nn0.VT3RqDAJK8z7xveaWj5Obxi5ie3wQX_O-5vh_cSzt94"
+            refreshToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDgwYmI3YS03YWZmLTQzM2EtYTcyNC05ZjZlYzM2ZjQ4YmUiLCJlbWFpbCI6ImhpZXUyMkBnbWFpbC5jb20iLCJpYXQiOjE3MjY2NDg0NDYsImV4cCI6MTcyNzI1MzI0Nn0.AGNnEXiVA8mr5N6HSbW8xIEemRPceL7ydP8T9O1OrPg"
+    ProfileUser:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: "5080bb7a-7aff-433a-a724-9f6ec36f48be"
+        email:
+          type: string
+          example: "hIEU"
+        name:
+          type: string
+          example: "hIEU\n"
+        address:
+          type: string
+          example: null
+        avatar:
+          type: string
+          example: null
+  securitySchemes:
+    cookieAuth:   
+      type: apiKey
+      in: cookie
+      name: authorization
+
+    cookieClientId:   
+      type: apiKey
+      in: cookie
+      name: x-client-id
+    

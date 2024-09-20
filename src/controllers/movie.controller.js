@@ -3,9 +3,10 @@ const MovieService = require("../services/movie.service");
 
 class MovieController{
     createMovie = async ( req, res, next ) => {
+        const { file, file_video } = req.files;
         new SuccessResponse({
             message: "create movie success",
-            metadata: await MovieService.createMovie(req.body)
+            metadata: await MovieService.createMovie(req.body, file ? file[0] : null, file_video ? file_video[0] : null)
         }).send(res);
     }
 
@@ -43,6 +44,13 @@ class MovieController{
         new SuccessResponse({
             message: "search movie success",
             metadata: await MovieService.searchMovie(movie_title)
+        }).send(res);
+    }
+
+    deleteMovie = async (req,res,next) => {
+        new SuccessResponse({
+            message: "delete movie success",
+            metadata: await MovieService.deleteMovieById(req.params.id)
         }).send(res);
     }
 }

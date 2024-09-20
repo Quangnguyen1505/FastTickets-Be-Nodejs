@@ -18,13 +18,14 @@ module.exports = (sequelize, DataTypes) => {
   Movie.init({
     title: DataTypes.STRING,
     image: DataTypes.STRING,
+    video_trailer: DataTypes.STRING,
     content: DataTypes.STRING,
     time: DataTypes.STRING,
     director: DataTypes.STRING,
     performer: DataTypes.STRING,
     price: DataTypes.STRING,
     movie_categoryId: DataTypes.UUID,
-    movie_status: DataTypes.ENUM('Now Showing', 'Coming Soon', 'Previously Shown'),
+    movie_status: DataTypes.ENUM("dangchieu", "sapchieu", "dachieu"),
     country: DataTypes.STRING
   }, {
     sequelize,

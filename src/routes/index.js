@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.use('/v1/api/access', require('./Access'));
+router.use('/v1/api/role', require('./Role'));
 router.use('/v1/api/auth', require('./Oauth2'));
 router.use('/v1/api/event', require('./Event'));
 router.use('/v1/api/movie', require('./Movie'));
