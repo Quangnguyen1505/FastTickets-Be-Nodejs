@@ -4,4 +4,6 @@ const handlerError = fn => {
     }
 }
 
-module.exports = handlerError
+module.exports = {
+    handlerError
+}

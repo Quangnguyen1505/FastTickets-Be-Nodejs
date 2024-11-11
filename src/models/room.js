@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     room_seat_type: DataTypes.ARRAY(DataTypes.STRING),
     room_status: DataTypes.BOOLEAN,
     room_currently_showing: DataTypes.UUID,
+    room_price_currently_showing: DataTypes.ARRAY(DataTypes.JSON),
     room_previously_shown: DataTypes.ARRAY(DataTypes.JSON),
     room_release_date: DataTypes.DATE,
     room_show_times: DataTypes.ARRAY(DataTypes.DATE)

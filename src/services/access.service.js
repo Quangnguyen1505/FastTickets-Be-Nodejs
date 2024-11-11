@@ -109,6 +109,23 @@ class AccessService {
         return foundUser;
    }
 
+   static changePassword = async ({ email, old_password, new_password }) => {
+
+        const foundUser = await findByEmail({ email });
+        if(!foundUser) throw new BadRequestError('Shop is not registered');
+        
+        const match = await bcrypt.compare( old_password, foundUser.password );
+        console.log("match::", match);
+        
+        if(!match) throw new AuthFailureError('Authencation error');
+
+        const salt = 10;
+        const password = await bcrypt.hash(new_password, salt);
+    
+        const updateNewPassword = await updateUserByUserId({userId: foundUser.id, payload: {password}});
+        return updateNewPassword;
+   }
+
    static updateUser = async ({ userId, payload }) => {
         const foundUser = await findByUserId({userId}); 
         if(!foundUser) throw new BadRequestError('User is not registered');

@@ -137,8 +137,14 @@ class RoomService{
             movieUsed.push(previouslyShown);
             movieUsed = movieUsed.flat();
         }
+
+        // type seat price different
+        let room_price = [];
+        room_price[0] = { price: parseInt(foundMovie.price) + 10 };
+        room_price[1] = { price: parseInt(foundMovie.price) + 15 };
+        room_price[2] = { price: parseInt(foundMovie.price) + 25 };
           
-        const newRoom = await updateMovieToRoom(foundRoom.id, movieId, dateMovieNow, movieUsed);
+        const newRoom = await updateMovieToRoom(foundRoom.id, movieId, dateMovieNow, movieUsed, room_price);
 
         return newRoom;
     }

@@ -30,6 +30,10 @@ module.exports = {
           key: 'id'
         }
       },
+      room_price_currently_showing: {
+        type: Sequelize.ARRAY(Sequelize.JSON),
+        defaultValue: []
+      },
       room_previously_shown: {
         type: Sequelize.ARRAY(Sequelize.JSON),
         defaultValue: []

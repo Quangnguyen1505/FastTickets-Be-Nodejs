@@ -1,7 +1,7 @@
 const express = require('express');
 const MovieController = require('../../controllers/movie.controller');
 const router = express.Router();
-const handlerError = require('../../helper/asyncHandler');
+const { handlerError } = require('../../helper/asyncHandler');
 const { authencationV2 } = require('../../auth/authUtils');
 const { uploadDisk } = require('../../config/multer.config');
 

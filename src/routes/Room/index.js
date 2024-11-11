@@ -1,7 +1,7 @@
 const express = require('express');
 const roomController = require('../../controllers/room.controller');
 const router = express.Router();
-const handlerError = require('../../helper/asyncHandler');
+const { handlerError } = require('../../helper/asyncHandler');
 const { authencationV2 } = require('../../auth/authUtils');
 
 router.get("/findAll", handlerError(roomController.getAllRoom));

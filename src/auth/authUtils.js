@@ -1,5 +1,5 @@
 const JWT = require('jsonwebtoken');
-const asyncHandler = require('../helper/asyncHandler')
+const { handlerError:asyncHandler } = require('../helper/asyncHandler')
 const { findByUserId } = require('../services/keyToken.service');
 const { AuthFailureError, NotFoundError } = require('../core/error.response');
 const logger = require('../loggers/winston.log');
@@ -46,10 +46,8 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
       6. OK all => return next()
     */
     // const userId = req.headers[HEADER.CLIENT_ID];
-    console.log("req.cookies::", req.cookies);
     const userId = req.cookies[HEADER.CLIENT_ID];
     // if( !userId ) throw new AuthFailureError('Invalid Request');
-    console.log("userId", userId);
     if( !userId ) return;
     
     const keyStore = await findByUserId(userId);
@@ -89,6 +87,7 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
         req.keyStore = keyStore;
         req.userId = decodeUser.userId;
         req.user = decodeUser;
+        req.email = decodeUser.email;
         return next();
         
     } catch (error) {
