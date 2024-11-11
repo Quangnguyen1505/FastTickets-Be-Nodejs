@@ -1,7 +1,7 @@
 const express = require('express');
 const bookingController = require('../../controllers/booking.controller');
 const router = express.Router();
-const handlerError = require('../../helper/asyncHandler');
+const { handlerError } = require('../../helper/asyncHandler');
 const { authencationV2 } = require('../../auth/authUtils');
 
 router.get("/checkout/:roomId", handlerError(bookingController.checkoutbooking));

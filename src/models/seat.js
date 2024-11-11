@@ -14,9 +14,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Seat.init({
-    seat_normal: DataTypes.JSONB,
-    seat_vip: DataTypes.JSONB,
-    seat_couple: DataTypes.JSONB
+    seat_row: DataTypes.STRING,
+    seat_number: DataTypes.INTEGER,
+    seat_type: DataTypes.STRING,
+    seat_roomId: DataTypes.UUID
   }, {
     sequelize,
     modelName: 'Seat',

@@ -7,6 +7,8 @@ var compression = require('compression')
 const cors = require('cors');
 const dbconn = require('./db/init.postgresql');
 const cookieParser = require('cookie-parser')
+const swaggerUi = require('swagger-ui-express');
+
 
 //init middelwares
 app.use(morgan("dev"));
@@ -16,11 +18,19 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }))
+// app.use(cors({
+//     origin: 'http://localhost:4200', 
+//     credentials: true 
+// }));
 app.use(cors({
-    origin: 'http://localhost:4200', 
+    origin: '*', 
     credentials: true 
 }));
 app.use(cookieParser());
+
+//init swagger ui
+const { openApiDoc } = require('./config/swaggerDoc.config');
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
 //init db
 dbconn();

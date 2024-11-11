@@ -7,6 +7,7 @@ const { getInfoData } = require("../utils");
 const db = require('../models');
 const { findByEmail, findByUserId, updateUserByUserId } = require("../models/repo/accsess.repo");
 const userValidate = require("../helper/validation");
+const { development } = require("../config/config");
 
 RoleShop = {
     SHOP:'SHOP',
@@ -69,7 +70,7 @@ class AccessService {
             const salt = 10;
             const passwordHash = await bcrypt.hash(password, salt);
 
-            const newUser = await db.User.create({ name, email, password: passwordHash, address });
+            const newUser = await db.User.create({ name, email, password: passwordHash, address, role: development.role_user });
 
            if(newUser){
 
@@ -106,6 +107,23 @@ class AccessService {
         const foundUser = await findByUserId({userId});
         if(!foundUser) throw new BadRequestError('User is not registered');
         return foundUser;
+   }
+
+   static changePassword = async ({ email, old_password, new_password }) => {
+
+        const foundUser = await findByEmail({ email });
+        if(!foundUser) throw new BadRequestError('Shop is not registered');
+        
+        const match = await bcrypt.compare( old_password, foundUser.password );
+        console.log("match::", match);
+        
+        if(!match) throw new AuthFailureError('Authencation error');
+
+        const salt = 10;
+        const password = await bcrypt.hash(new_password, salt);
+    
+        const updateNewPassword = await updateUserByUserId({userId: foundUser.id, payload: {password}});
+        return updateNewPassword;
    }
 
    static updateUser = async ({ userId, payload }) => {

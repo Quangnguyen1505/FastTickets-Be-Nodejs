@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server",
+    "dev": "nodemon server.js",
     "migrate:up": "npx sequelize-cli db:migrate"
   },
   "keywords": [],
@@ -36,6 +36,8 @@
     "sequelize": "^6.37.3",
     "sequelize-cli": "^6.6.2",
     "slugify": "^1.6.6",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0",
     "winston": "^3.13.0"
   }

@@ -10,7 +10,7 @@ class BookingService {
     //     {
     //         "seat": "vip",
     //         "location": "h4",
-    //         "price": 41000
+    //         "price": 41000,
     //     },
     //     {
     //         "seat": "vip",
@@ -32,6 +32,17 @@ class BookingService {
 
         const checkPriceExists = checkDB.includes(false);
         if(checkPriceExists) throw new NotFoundError('Price not exists!!');
+        
+        // for (var i = 0; i < user_order.length; i++) {
+        //     if(user_order[i].type == 'vip') {
+        //         user_order[i].price += 41;
+        //         console.log("user_order.price", user_order[i].price);
+                
+        //     } else if(user_order[i].type == 'normal') {
+        //         user_order[i].price += 31;
+        //         console.log("normal.price", user_order[i].price);
+        //     }
+        // }
         
 
         const checkoutPrice = await user_order.reduce((acc, item) => {

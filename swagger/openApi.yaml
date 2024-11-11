@@ -1,0 +1,1527 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description: |-
+    **This is a sample Pet Store Server based on the OpenAPI 3.0 specification**.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+    That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+
+    _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+    
+    Some useful links:
+    - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: quang0706r@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8000/v1/api
+    description: Development server
+tags:
+  - name: User
+    description: Everything related to user management
+  - name: Oauth2
+    description: Everything about your Oauth2
+  - name: Booking
+    description: Everything about your booking
+  - name: Category
+    description: Everything about your category
+  - name: Event
+    description: Everything about your event
+  - name: Role
+    description: Everything about your role
+  - name: Room
+    description: Everything about your room
+  - name: Movie
+    description: Everything about your movie
+paths:
+  /access/login:
+    post:
+      tags:
+        - User
+      summary: Logs user into the system
+      description: 'Login into the system with email and password'
+      operationId: login
+      requestBody:
+        description: Login user in the cinema
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'login user success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    $ref: '#/components/schemas/LoginResponseMetadata'
+  
+        '401':
+          description: wrong input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Authencation error
+                  code: 
+                    type: integer
+                    example: 401
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404
+  /access/signUp:
+    post:
+      tags:
+        - User
+      summary: Sign up user
+      description: 'Sign up user'
+      operationId: signUp
+      requestBody:
+        description: SignUp user in the cinema
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'SignUp successful'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    $ref: '#/components/schemas/SignUpResponseMetadata'
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Error: Shop already registered!'
+                  code: 
+                    type: integer
+                    example: 404
+  /access/profile:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      description: 'Get user profile'
+      operationId: getProfile
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get profile success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    $ref: '#/components/schemas/ProfileUser'
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+  /access/logout:
+    get:
+      tags:
+        - User
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logout
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'logout user success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata:
+                    type: integer
+                    example: 1
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+  /access/update:
+    post:
+      tags:
+        - User
+      summary: Update user profile
+      description: 'Update user profile'
+      operationId: updateProfile
+      requestBody:
+        description: Update user profile in the cinema
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: 
+                  type: string
+                  example: "Hieu dep trai"
+                avatar:
+                  type: string
+                  example: "123.jpg"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: update User successful
+                  status::
+                    type: integer
+                    example: 200
+                  metadata:
+                    type: array
+                    example: [1]
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Not Found keyStore
+                  code: 
+                    type: integer
+                    example: 404
+  /access/change-password:
+    post:
+      tags:
+        - User
+      summary: Change password
+      description: 'Change password'
+      operationId: changePassword
+      requestBody:
+        description: Change password in the cinema
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_password:
+                  type: string
+                  example: "12345678"
+                new_password:
+                  type: string
+                  example: "123456789"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'change password success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata:
+                    type: array
+                    example: [1]
+        '401':
+          description: wrong password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Authencation error
+                  code: 
+                    type: integer
+                    example: 401
+        '404':
+          description: User not found
+  /auth/google:
+    get:
+      tags:
+        - Oauth2
+      summary: Login with google
+      description: 'Login with google'
+      operationId: loginGoogle
+      responses:
+        '302':
+          description: redrect to google
+  /booking/create:
+    post: 
+      tags:
+        - Booking
+      summary: Create booking
+      description: 'When user choose movie and buy ticket online -> create booking'
+      operationId: createBooking
+      requestBody:
+        description: Create booking in the cinema
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/CreateBookingBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'create booking success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    $ref: '#/components/schemas/BookingResponseMetadata'
+        '401':
+          description: wrong input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Authencation error
+                  code: 
+                    type: integer
+                    example: 401
+  /booking:
+    get:
+      tags:
+        - Booking
+      summary: Get all booking
+      description: 'Get all booking'
+      operationId: getBooking
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get All Booking successs'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookingResponseMetadata'
+        '401':
+          description: wrong input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Authencation error
+                  code: 
+                    type: integer
+                    example: 401
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404 
+  /booking/{id}:
+    get:
+      tags:
+        - Booking
+      summary: Get booking by id
+      description: 'Get booking by id'
+      operationId: getBookingById
+      parameters:
+        - name: id
+          in: path
+          description: ID of booking to return
+          required: true
+          schema:
+            type: string
+            example: "b368cfa5-81a3-4caf-bbf5-31e361cb66fa"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get Booking success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    $ref: '#/components/schemas/BookingResponseMetadata'
+        '401':
+          description: wrong input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Authencation error
+                  code: 
+                    type: integer
+                    example: 401
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404
+  /booking/checkout/{roomId}:
+    get:
+      tags:
+        - Booking
+      summary: Checkout booking
+      description: 'Checkout booking'
+      operationId: checkoutBooking
+      parameters:
+        - name: roomId
+          in: path
+          description: ID of room to return
+          required: true
+          schema:
+            type: string
+            example: "b368cfa5-81a3-4caf-bbf5-31e361cb66fa"
+      requestBody:
+        description: Checkout booking in the cinema
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/checkoutReviewBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get checkout booking success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/checkoutReviewResponse'
+        '401':
+          description: wrong input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Authencation error
+                  code: 
+                    type: integer
+                    example: 401
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404
+  /cate/create:
+    post:
+      tags:
+        - Category
+      summary: Create category
+      description: 'Create category'
+      operationId: createCategory
+      requestBody:
+        description: Create category in the cinema
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cate_name: 
+                  type: string
+                  example: "Kinh dị"
+                cate_description:
+                  type: string
+                  example: "thể loại nói về phim Kinh dị"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'create category success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "b368cfa5-81a3-4caf-bbf5-31e361cb66fa"
+                      cate_name: "Kinh dị"
+                      cate_slug: "kinh-di"
+                      cate_description: "thể loại nói về phim Kinh dị"
+                      updatedAt: "2024-10-15T15:24:24.323Z"
+                      createdAt: "2024-10-15T15:24:24.323Z"
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Error: Category already registered!'
+                  code: 
+                    type: integer
+                    example: 404
+  /cate/getOne/{id}:
+    get:
+      tags:
+        - Category
+      summary: Get category by id
+      description: 'Get category by id'
+      operationId: getCategoryById
+      parameters:
+        - name: id
+          in: path
+          description: ID of category to return
+          required: true
+          schema:
+            type: string
+            example: "42d32302-5b21-4145-a86a-e65d14db260e"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get category by Id success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "b368cfa5-81a3-4caf-bbf5-31e361cb66fa"
+                      cate_name: "Kinh dị"
+                      cate_slug: "kinh-di"
+                      cate_description: "thể loại nói về phim Kinh dị"
+                      updatedAt: "2024-10-15T15:24:24.323Z"
+                      createdAt: "2024-10-15T15:24:24.323Z"
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404
+  /cate/get/category:
+    get:
+      tags:
+        - Category
+      summary: Get all category
+      description: 'Get all category'
+      operationId: getAllCategory
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get all category success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: array
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404
+  /event/create:
+    post:
+      tags:
+        - Event
+      summary: Create event
+      description: 'Create event'
+      operationId: createEvent
+      requestBody:
+        description: Create event in the cinema
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: 
+                  type: string
+                  example: "Chuong trinh sale lon"
+                description:
+                  type: string
+                  example: "day la mot chuong trinh khuyen mai gom cac disscount"
+                event_start:
+                  type: string
+                  example: "2023-12-30 12:10:00"
+                event_end:
+                  type: string
+                  example: "2024-1-1 12:10:00"
+                image:
+                  type: string
+                  example: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'create event success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "1c0f417b-243a-4463-b926-cec38959d561"
+                      title: "Chuong trinh sale lon nhat"
+                      description: "day la mot chuong trinh khuyen mai gom cac disscount"
+                      event_start: "2023-12-30T05:10:00.000Z"
+                      event_end: "2024-01-01T05:10:00.000Z"
+                      image: "133.jpg"
+                      status: false
+                      updatedAt: "2024-10-15T15:50:59.472Z"
+                      createdAt: "2024-10-15T15:50:59.472Z"
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Error: Event already registered!'
+                  code: 
+                    type: integer
+                    example: 404
+  /findAll/event:
+    get:
+      tags:
+        - Event
+      summary: Get all event
+      description: 'Get all event'
+      operationId: getAllEvent
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get All event success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: array
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404
+  /event/{id}:
+    get:
+      tags:
+        - Event
+      summary: Get event by id
+      description: 'Get event by id'
+      operationId: getEventById
+      parameters:
+        - name: id
+          in: path
+          description: ID of event to return
+          required: true
+          schema:
+            type: string
+            example: "f9274f63-28e4-4d7d-8cf8-2382764268a6"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get event by Id success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "f9274f63-28e4-4d7d-8cf8-2382764268a6"
+                      title: "Chuong trinh sale lon"
+                      description: "day la mot chuong trinh khuyen mai gom cac disscount"
+                      status: false
+                      image: "133.jpg"
+                      event_start: "2023-12-30T05:10:00.000Z"
+                      event_end: "2024-01-01T05:10:00.000Z"
+  /role/create:
+    post:
+      tags:
+        - Role
+      summary: Create role
+      description: 'Create role'
+      operationId: createRole
+      requestBody:
+        description: Create role in the cinema
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_name: 
+                  type: string
+                  example: "User"
+                role_slug:
+                  type: string
+                  example: "user-system"
+                role_status:
+                  type: string
+                  example: "active"
+                role_description:
+                  type: string
+                  example: "User use system"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'create role success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "b368cfa5-81a3-4caf-bbf5-31e361cb66fa"
+                      role_name: "User"
+                      role_slug: "user-system"
+                      role_description: "User use system"
+                      updatedAt: "2024-10-15T15:24:24.323Z"
+                      createdAt: "2024-10-15T15:24:24.323Z"
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Error: Role already registered!'
+                  code: 
+                    type: integer
+                    example: 404
+  /role/get/{id}:
+    get:
+      tags:
+        - Role
+      summary: Get role by id
+      description: 'Get role by id'
+      operationId: getRoleById
+      parameters:
+        - name: id
+          in: path
+          description: ID of role to return
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get role by Id success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "1"
+                      role_name: "User"
+                      role_slug: "user-system"
+                      role_description: "User use system"
+                      updatedAt: "2024-10-15T15:24:24.323Z"
+                      createdAt: "2024-10-15T15:24:24.323Z"
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404
+  /room/create:
+    post:
+      tags:
+        - Room
+      summary: Create room
+      description: 'Create room'
+      operationId: createRoom
+      requestBody:
+        description: Create room in the cinema
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomBody'         
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'create room success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "992b6015-93db-47a0-9df5-256506263396"
+                      room_name: "Cinema 22"
+                      room_seat_quantity: 44
+                      room_seat_type: [
+                          "normal",
+                          "vip",
+                          "couple"
+                      ]
+                      room_status: true
+                      room_currently_showing: null
+                      room_previously_shown: null
+                      room_release_date: "2024-05-28T00:00:00.000Z"
+                      room_show_times: [
+                          "2024-05-28T12:10:00.000Z",
+                          "2024-05-28T13:10:00.000Z"
+                      ]
+                      updatedAt: "2024-10-16T03:33:00.870Z"
+                      createdAt: "2024-10-16T03:33:00.870Z"
+                      room_price_currently_showing: []
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Error: Room already registered!'
+                  code: 
+                    type: integer
+                    example: 404
+  /room/findAll:
+    get:
+      tags:
+        - Room
+      summary: Get all Room
+      description: 'Get all Room'
+      operationId: getRoom
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get all Room successs'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+        '401':
+          description: wrong input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: Authencation error
+                  code: 
+                    type: integer
+                    example: 401
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Shop is not registered'
+                  code: 
+                    type: integer
+                    example: 404 
+  /room/findOne/{roomId}:
+    get:
+      tags:
+        - Room 
+      summary: Get event by id
+      description: 'Get event by id'
+      operationId: getEventById
+      parameters:
+        - name: roomId
+          in: path
+          description: ID of event to return
+          required: true
+          schema:
+            type: string
+            example: "f9274f63-28e4-4d7d-8cf8-2382764268a6"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'get event by Id success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+                    example: 
+                      id: "f9274f63-28e4-4d7d-8cf8-2382764268a6"
+                      title: "Chuong trinh sale lon"
+                      description: "day la mot chuong trinh khuyen mai gom cac disscount"
+                      status: false
+                      image: "133.jpg"
+                      event_start: "2023-12-30T05:10:00.000Z"
+                      event_end: "2024-01-01T05:10:00.000Z"
+  /movie/create:
+    post:
+      tags:
+        - Movie
+      summary: Create movie
+      description: 'Create movie'
+      operationId: createmovie
+      requestBody:
+        description: Create movie in the cinema
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovieBody'         
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: 'create room success'
+                  status: 
+                    type: integer
+                    example: 200
+                  metadata: 
+                    type: object
+        '400':
+          description: Invalid username/password supplied
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: error                  
+                  message: 
+                    type: string
+                    example: 'Error: Room already registered!'
+                  code: 
+                    type: integer
+                    example: 404
+components:
+  schemas:
+    LoginBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: "hieu22@gmail.com"
+        password:
+          type: string
+          example: "1223"
+    LoginResponseMetadata:
+      type: object
+      properties:
+        shop: 
+          type: object
+          properties:
+            id: 
+              type: string
+              example: "5080bb7a-7aff-433a-a724-9f6ec36f48be"
+            name:
+              type: string
+              example: "hIEU"
+            email:
+              type: string
+              example: "hieu22@gmail.com"
+        tokens:
+          type: object
+          properties:
+            accessToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDgwYmI3YS03YWZmLTQzM2EtYTcyNC05ZjZlYzM2ZjQ4YmUiLCJlbWFpbCI6ImhpZXUyMkBnbWFpbC5jb20iLCJpYXQiOjE3MjY2NDg0NDYsImV4cCI6MTcyNjgyMTI0Nn0.VT3RqDAJK8z7xveaWj5Obxi5ie3wQX_O-5vh_cSzt94"
+            refreshToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDgwYmI3YS03YWZmLTQzM2EtYTcyNC05ZjZlYzM2ZjQ4YmUiLCJlbWFpbCI6ImhpZXUyMkBnbWFpbC5jb20iLCJpYXQiOjE3MjY2NDg0NDYsImV4cCI6MTcyNzI1MzI0Nn0.AGNnEXiVA8mr5N6HSbW8xIEemRPceL7ydP8T9O1OrPg"
+    SignUpBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: "Quang"
+        email:
+          type: string
+          example: "quang12345@gmail.com"
+        password:
+          type: string
+          example: "12345678"
+    SignUpResponseMetadata:
+      type: object
+      properties:
+        shop:
+          type: object
+          properties:
+            id: 
+              type: string
+              example: "dd4528e1-d243-4494-823a-df50584b7680"
+            name:
+              type: string
+              example: "Quang"
+            email:
+              type: string
+              example: "quang12345@gmail.com"
+        tokens:
+          type: object
+          properties:
+            accessToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZDQ1MjhlMS1kMjQzLTQ0OTQtODIzYS1kZjUwNTg0Yjc2ODAiLCJlbWFpbCI6InF1YW5nMTIzNDVAZ21haWwuY29tIiwiaWF0IjoxNzI3MDUzMTc0LCJleHAiOjE3MjcyMjU5NzR9.TxxvL4A3i45wN7pd9z1eILu3hDEPhKbvYyNr2bCgxrI"
+            refreshToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZDQ1MjhlMS1kMjQzLTQ0OTQtODIzYS1kZjUwNTg0Yjc2ODAiLCJlbWFpbCI6InF1YW5nMTIzNDVAZ21haWwuY29tIiwiaWF0IjoxNzI3MDUzMTc0LCJleHAiOjE3Mjc2NTc5NzR9.V5zVbX3DtTHTC-gB7-JEWcCNvBVQU9S69CldLd0HFXI"
+    UpdateBody:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Quang"
+        avatar:
+          type: string
+          example: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg"
+    UpdateResponseMetadata:
+      type: object
+    ProfileUser:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: "5080bb7a-7aff-433a-a724-9f6ec36f48be"
+        email:
+          type: string
+          example: "hIEU"
+        name:
+          type: string
+          example: "hIEU\n"
+        address:
+          type: string
+          example: null
+        avatar:
+          type: string
+          example: null
+    CreateBookingBody:
+      type: object
+      properties:
+        movieId: 
+          type: string
+          example: "5292e426-a6a2-4b4b-bfe0-7c2475730b38" 
+        roomId:
+          type: string
+          example: "b2fd34e0-2f7b-4509-be6f-26e1c738c1da"
+        user_order: 
+          type: array
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/UserBodyOrderExampleOne'
+              - $ref: '#/components/schemas/UserBodyOrderExampleTwo'
+        address_order:
+          type: string
+          example: "hanoi"
+    UserBodyOrderExampleOne:
+      type: object
+      properties:
+        seat:
+          type: string
+          example: "vip"
+        location:
+          type: string
+          example: "h4"
+        price:
+          type: integer
+          example: 65
+    UserBodyOrderExampleTwo:
+      type: object
+      properties:
+        seat:
+          type: string
+          example: "vip"
+        location:
+          type: string
+          example: "h5"
+        price:
+          type: string
+          example: 65
+    BookingResponseMetadata:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: "30338337-b2af-4f28-8de4-5f6d57164cf2"
+        booking_roomId:
+          type: string
+          example: "c886dfa4-caec-4daf-8b02-2ddaced012f4"
+        booking_seats:
+          type: array
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/UserBodyOrderExampleOne'
+              - $ref: '#/components/schemas/UserBodyOrderExampleTwo'
+        booking_userId:
+          type: string
+          example: "dd4528e1-d243-4494-823a-df50584b7680"
+        booking_movieId:
+          type: string
+          example: "ff9947ba-cbea-4bf9-a9d7-7fb2a5ab1a24"
+        booking_address:
+          type: string
+          example: "hanoi"
+        booking_total_checkout:
+          type: string
+          example: "130"
+        updatedAt:
+          type: string
+          example: "2024-10-15T13:57:13.817Z"
+        createdAt:
+          type: string
+          example: "2024-10-15T13:57:13.817Z"
+    checkoutReviewBody:
+      type: object
+      properties:
+        user_order: 
+          type: array
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/UserBodyBookingExampleOne'
+              - $ref: '#/components/schemas/UserBodyBookingExampleTwo'
+    checkoutReviewResponse:
+      type: object
+      properties:
+        checkoutPrice:
+          type: integer
+          example: 202
+        address:
+          type: string
+          example: ""
+        user_order:
+          type: array
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/UserBodyBookingExampleOne'
+              - $ref: '#/components/schemas/UserBodyBookingExampleTwo'
+    UserBodyBookingExampleOne:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "vip"
+        location:
+          type: string
+          example: "h4"
+        price:
+          type: integer
+          example: 65
+    UserBodyBookingExampleTwo:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "vip"
+        location:
+          type: string
+          example: "h5"
+        price:
+          type: string
+          example: 65
+    RoomBody:
+      type: object
+      properties:
+        room_name:
+          type: string
+          example: "Cinema 21"
+        room_seat:
+          type: array
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/RoomSeatBodyExampleOne'
+              - $ref: '#/components/schemas/RoomSeatBodyExampleTwo'
+              - $ref: '#/components/schemas/RoomSeatBodyExampleThree'
+        room_status:
+          type: boolean
+          example: true
+        room_release_date:
+          type: string
+          example: "2024-05-28T00:00:00Z"
+        room_show_times:
+          type: array
+          example: ["2024-05-28T12:10:00Z", "2024-05-28T13:10:00Z"] 
+    RoomSeatBodyExampleOne:
+      type: object
+      properties:
+        type: 
+          type: string
+          example: "normal"
+        quantity:
+          type: integer 
+          example: 13
+    RoomSeatBodyExampleTwo:
+      type: object
+      properties:
+        type: 
+          type: string
+          example: "vip"
+        quantity:
+          type: integer 
+          example: 26
+    RoomSeatBodyExampleThree:
+      type: object
+      properties:
+        type: 
+          type: string
+          example: "couple"
+        quantity:
+          type: integer 
+          example: 5
+    MovieBody:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "The Conjuring"
+        content:
+          type: string
+          example: "The Conjuring is a 2013 American supernatural horror film directed by James Wan and written by Chad Hayes and Carey W. Hayes."
+        director:
+          type: string
+          example: "James Wan"
+        performer:
+          type: string
+          example: "Vera Farmiga, Patrick Wilson, Ron Livingston"
+        time:
+          type: string
+          example: "1h 52m"
+        video_trailer:
+          type: string
+          example: "https://www.youtube.com/watch?v=Vjk2So3Kv0E"
+        image:
+          type: string
+          example: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg"
+        movie_status:
+          type: string
+          example: dangchieu
+        movie_categoryId:
+          type: string
+          example: "Kinh dị"
+        country:
+          type: string
+          example: "United States"
+        price: 
+          type: integer
+          example: 65
+        

@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const router = express.Router();
-const handlerError = require('../../helper/asyncHandler');
+const { handlerError } = require('../../helper/asyncHandler');
 const { authencationV2 } = require('../../auth/authUtils');
 const oauth2Controller = require('../../controllers/oauth2.controller');
 const { authenOauth, authencationV1 } = require('../../auth/auth2');

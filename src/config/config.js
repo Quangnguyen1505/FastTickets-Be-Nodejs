@@ -8,6 +8,7 @@ module.exports = {
         host: PG_HOST,
         dialect: PG_DIALECT,
         logging: false,
-        timezone: '+07:00'
+        timezone: '+07:00',
+        role_user: 1,
     }
 }
