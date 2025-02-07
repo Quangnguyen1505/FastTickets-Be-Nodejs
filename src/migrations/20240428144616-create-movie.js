@@ -16,6 +16,9 @@ module.exports = {
       image: {
         type: Sequelize.STRING
       },
+      video_trailer: {
+        type: Sequelize.STRING
+      },
       content: {
         type: Sequelize.STRING
       },
@@ -39,7 +42,8 @@ module.exports = {
         }
       },
       movie_status: {
-        type: Sequelize.ENUM('Now Showing', 'Coming Soon', 'Previously Shown')
+        type: Sequelize.ENUM("dangchieu", "sapchieu", "dachieu"),
+        defaultValue: "dangchieu"
       },
       country: {
         type: Sequelize.STRING

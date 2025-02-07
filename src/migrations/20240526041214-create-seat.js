@@ -10,14 +10,21 @@ module.exports = {
         autoIncrement: false,
         primaryKey: true,
       },
-      seat_normal: {
-        type: Sequelize.JSONB
+      seat_row: {
+        type: Sequelize.STRING
       },
-      seat_vip: {
-        type: Sequelize.JSONB
+      seat_number: {
+        type: Sequelize.INTEGER
       },
-      seat_couple: {
-        type: Sequelize.JSONB
+      seat_type: {
+        type: Sequelize.STRING
+      },
+      seat_roomId: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'Rooms',
+          key: 'id'
+        }
       },
       createdAt: {
         allowNull: false,

@@ -4,7 +4,7 @@ const bookingService = require("../services/booking.service");
 class BookingController{
     checkoutbooking = async ( req, res, next ) => {
         new SuccessResponse({
-            message: "get booking success",
+            message: "get checkout booking success",
             metadata: await bookingService.checkoutReviewBooking({ roomId: req.params.roomId, payload: req.body })
         }).send(res);
     }

@@ -26,11 +26,12 @@ const foundAllRoom = async ({ limit, sort, page, unselect }) => {
     return foundRoom;
 }
 
-const updateMovieToRoom = async ( roomId, movieId, dateMovieNow, movieUsed ) => {
+const updateMovieToRoom = async ( roomId, movieId, dateMovieNow, movieUsed, room_price ) => {
     const newRoom = await db.Room.update({
         room_currently_showing: movieId,
         room_previously_shown: movieUsed,
-        room_release_date: dateMovieNow
+        room_release_date: dateMovieNow,
+        room_price_currently_showing: room_price
     }, {
         where: {id: roomId}
     });

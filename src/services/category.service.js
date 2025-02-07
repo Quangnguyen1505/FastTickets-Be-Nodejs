@@ -20,6 +20,14 @@ class CategoryService {
         return foundCate;
     }
 
+    static async getCategoryByName( cate_name ) {
+        const foundCate = await db.category.findOne({
+            where: { cate_name }
+        });
+
+        return foundCate;
+    }
+
     static async getCategories({ limit = 30, sort = 'ctime', page = 1 }) {
         const skip = ( page - 1 ) * limit;
         const sortBy = sort == 'ctime' ? {_id: -1} : {_id: 1};

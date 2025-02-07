@@ -12,6 +12,16 @@ const foundMovieById = async ( movieId ) => {
     return foundMovie
 }
 
+const foundMovieByName = async ( movie_title ) => {
+    const foundMovie = await db.Movie.findOne({
+        where: {
+            title: movie_title
+        }
+    })
+
+    return foundMovie
+}
+
 const searchMovie = async (movie_title) => {
     const movies = await db.Movie.findAll({
     where: {
@@ -27,5 +37,6 @@ const searchMovie = async (movie_title) => {
 
 module.exports = {
     foundMovieById,
-    searchMovie
+    searchMovie,
+    foundMovieByName
 }

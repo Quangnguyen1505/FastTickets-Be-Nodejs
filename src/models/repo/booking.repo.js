@@ -1,7 +1,7 @@
 const db = require('..');
 
 const SeatPrice = async ( room, user_order ) => {
-    const movie_Price = await room.room_seat.map(item => item.price);
+    const movie_Price = await room.room_price_currently_showing.map(item => item.price);
     return user_order.map( item => {
         return movie_Price.includes(item.price);
     });

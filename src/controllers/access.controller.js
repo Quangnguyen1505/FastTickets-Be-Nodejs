@@ -20,7 +20,7 @@ class AccessController{
         );
 
         new SuccessResponse({
-            message: "create user success",
+            message: "SignUp successful",
             metadata: {shop, tokens}
         }).send(res);
     }
@@ -64,10 +64,17 @@ class AccessController{
 
     updateUser = async (req,res,next) => {
         new SuccessResponse({
-            message: "update User success",
+            message: "update User successful",
             metadata: await AccessService.updateUser({ userId: req.userId, payload: req.body})
         }).send(res);
-    } 
+    }
+
+    changePassword = async (req,res,next) => {
+        new SuccessResponse({
+            message: "change password success",
+            metadata: await AccessService.changePassword({ email: req.email, ...req.body})
+        }).send(res);
+    }
 
 //     forgotPassword =  async (req,res,next)=>{
 //         console.log("req.body", req.body);
