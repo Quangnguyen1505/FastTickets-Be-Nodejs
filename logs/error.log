@@ -71,6 +71,8 @@
 [2024-08-01 11:11:33.426 AM error: 404 - Error: Shop already registered!]
 [2024-08-01 11:12:42.646 AM error: 404 - Error: Shop already registered!]
 [2024-08-01 11:13:24.384 AM error: 404 - Error: Shop already registered!]
+<<<<<<< Updated upstream
+=======
 [2024-08-10 11:39:51.165 PM error: 404 - Room already exists!]
 [2024-08-10 11:44:22.348 PM error: 404 - Room already exists!]
 [2024-09-18 03:52:55.835 PM error: 404 - Shop is not registered]
@@ -113,3 +115,5 @@
 [2024-10-15 10:01:56.304 PM error: 404 - Varible invalid!!]
 [2024-10-15 10:02:02.125 PM error: 404 - Varible invalid!!]
 [2024-10-15 10:10:45.638 PM error: 404 - Price not exists!!]
+[2025-02-07 08:39:54.316 AM error: 401 - Authencation error]
+>>>>>>> Stashed changes
