@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Seats', {
+    await queryInterface.createTable('Seat_types', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal("gen_random_uuid()"),
@@ -10,21 +10,11 @@ module.exports = {
         autoIncrement: false,
         primaryKey: true,
       },
-      seat_row: {
+      name: {
         type: Sequelize.STRING
       },
-      seat_number: {
-        type: Sequelize.INTEGER
-      },
-      seat_type: {
-        type: Sequelize.STRING
-      },
-      seat_roomId: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'Rooms',
-          key: 'id'
-        }
+      description: {
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,
@@ -37,6 +27,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Seats');
+    await queryInterface.dropTable('Seat_types');
   }
 };

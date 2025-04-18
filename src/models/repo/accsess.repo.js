@@ -1,16 +1,16 @@
-const db = require('..');
+const db = require('../../models');
 
 const findByEmail = async ({ email, select = [
-    "id", "email", "password", "name"
+    "id", "usr_email", "usr_password", "usr_first_name", "usr_last_name"
 ]}) => {
     return await db.User.findOne({
-        where: {email: email},
+        where: {usr_email: email},
         attributes: select
     });
 }
 
 const findByUserId = async ({ userId, select = [
-    "id", "email", "name", "address", "avatar"
+    "id", "usr_email", "usr_password", "usr_first_name", "usr_last_name", "usr_phone", "usr_address", "usr_avatar_url"
 ]}) => {
     return await db.User.findOne({
         where: {id: userId},
@@ -24,7 +24,8 @@ const updateUserByUserId = async ({ userId, payload }) => {
         {
             where: {
                 id: userId
-            }
+            },
+            returning: true,
         }
     )
 }

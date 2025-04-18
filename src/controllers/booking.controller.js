@@ -5,7 +5,7 @@ class BookingController{
     checkoutbooking = async ( req, res, next ) => {
         new SuccessResponse({
             message: "get checkout booking success",
-            metadata: await bookingService.checkoutReviewBooking({ roomId: req.params.roomId, payload: req.body })
+            metadata: await bookingService.checkoutReviewBooking({ show_time_id: req.params.showtime_id, payload: req.body })
         }).send(res);
     }
 

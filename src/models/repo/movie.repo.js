@@ -15,7 +15,7 @@ const foundMovieById = async ( movieId ) => {
 const foundMovieByName = async ( movie_title ) => {
     const foundMovie = await db.Movie.findOne({
         where: {
-            title: movie_title
+            movie_title
         }
     })
 

@@ -10,22 +10,45 @@ module.exports = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal("gen_random_uuid()")
       },
-      name: {
+      usr_first_name: {
         type: Sequelize.STRING
       },
-      avatar: {
+      usr_last_name: {
         type: Sequelize.STRING
       },
-      email: {
+      usr_avatar_url: {
         type: Sequelize.STRING
       },
-      password: {
+      usr_email: {
         type: Sequelize.STRING
       },
-      address: {
+      usr_slug: {
         type: Sequelize.STRING
       },
-      role: {
+      usr_phone: {
+        type: Sequelize.STRING
+      },
+      usr_date_of_birth: {
+        type: Sequelize.DATE
+      },
+      usr_password: {
+        type: Sequelize.STRING
+      },
+      usr_salf: {
+        type: Sequelize.INTEGER
+      },
+      usr_sex: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
+      usr_address: {
+        type: Sequelize.STRING
+      },
+      usr_status: {
+        type: Sequelize.ENUM("active", "block"),
+        defaultValue: 'active'
+      },
+      usr_role_id: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Roles',

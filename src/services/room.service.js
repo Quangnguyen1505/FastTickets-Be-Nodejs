@@ -3,6 +3,7 @@ const db = require('../models');
 const { foundRoomById, foundAllRoom, updateMovieToRoom } = require('../models/repo/room.repo');
 const { foundMovieById } = require('../models/repo/movie.repo');
 const { createSeat } = require('./seat.service');
+const { findSeatTypeByName } = require('../models/repo/seat_type.repo');
 
 // {
 //     "room_name": "Cinema 4", 
@@ -20,133 +21,187 @@ const { createSeat } = require('./seat.service');
 //             "quantity": 5,
 //         }
 //     ], 
-//     "room_status": true, 
-//     "room_currently_showing": "5292e426-a6a2-4b4b-bfe0-7c2475730b38",
-//     "room_release_date": "2024-05-28T00:00:00Z", 
-//     "room_show_times": ["2024-05-28T12:10:00Z", "2024-05-28T13:10:00Z"] 
 // }
 
 
 class RoomService{
-    static async createRoom( payload ){
-        if( !payload ) throw new NotFoundError('varible invalid!!');
-        const {
-            room_name, room_seat, room_status, room_currently_showing ,room_previously_shown = null,
-            room_release_date, room_show_times 
-        } = payload;
-
+    static async createRoom(payload) {
+        if (!payload) throw new NotFoundError('Variable invalid!!');
+        
+        const { room_name, room_seat_quantity, room_release_date, room_seat } = payload;
+    
+        console.log(room_name);
         const foundRoom = await db.Room.findOne({ where: { room_name } });
-        if(foundRoom) throw new BadRequestError('Room already exists!');
-
-        // const foundMovie = await foundMovieById(room_currently_showing);
-        // for (let i = 0; i < 1; i++) {
-        //     room_seat[0].price = parseInt(foundMovie.price) + 10;
-        //     room_seat[1].price = parseInt(foundMovie.price) + 15;
-        //     room_seat[2].price = parseInt(foundMovie.price) + 25;
-        // }
-
-        const totalSeatQuantity = await room_seat.reduce((acc, item) => {
-            return acc + item.quantity
-        }, 0);
+    
+        if (foundRoom) throw new BadRequestError('Room already exists!');
         
         const newRoom = await db.Room.create({
-            room_name, room_seat_quantity: totalSeatQuantity, room_seat_type: room_seat.map(item => item.type), room_status, 
-            room_currently_showing ,room_previously_shown, room_release_date, room_show_times 
+            room_name,
+            room_seat_quantity,
+            room_release_date
         });
-        
-        if(!newRoom) throw new BadRequestError('New Room failed!!');
-
-        // room_seat: {
-        //     "quantity": 30,
-        //     "type": ["normal", "vip", "couple"],
-        // }
-        let row_vip = 'A', row_normal = 'N', temp =1;
-        let seatCount = 0;
+    
+        if (!newRoom) throw new BadRequestError('New Room failed!!');
+    
+        // Đặt các hàng bắt đầu từ A cho ghế normal, D cho ghế vip, và H cho ghế couple
+        let row_normal = 'A', row_vip = 'D', row_couple = 'H';
+        let seatCountNormal = 0, seatCountVip = 0, seatCountCouple = 0;
+        let tempNormal = 1, tempVip = 1, tempCouple = 1;
+    
         for (let i = 0; i < room_seat.length; i++) {
-            for (let j = 1; j <= room_seat[i].quantity; j++) {
+            const hasSeatType = await findSeatTypeByName(room_seat[i].type);
+            if (!hasSeatType) throw new BadRequestError('Seat type not found');
+    
+            const new_room_seat_type = await db.Room_seat_type.create({
+                room_id: newRoom.id,
+                seat_type_id: hasSeatType.id,
+                quantity: room_seat[i].quantity
+            });
+    
+            console.log("new_room_seat_type", new_room_seat_type);
+    
+            for (let j = 0; j < new_room_seat_type.quantity; j++) {
                 switch (room_seat[i].type) {
                     case 'normal':
                         await createSeat({
-                            seat_number: temp,
+                            seat_number: tempNormal,
                             seat_row: row_normal,
-                            seat_type: room_seat[i].type,
-                            seat_roomId: newRoom.id 
+                            seat_type_id: new_room_seat_type.seat_type_id,
+                            seat_roomId: newRoom.id
                         });
-                        seatCount++;
-                        temp++;
-                        if (seatCount % 10 === 0) {
+                        seatCountNormal++;
+                        tempNormal++;
+    
+                        // Sau mỗi 8 ghế, chuyển sang hàng tiếp theo
+                        if (seatCountNormal % 8 === 0) {
                             row_normal = String.fromCharCode(row_normal.charCodeAt(0) + 1);
-                            temp = 1;
+                            tempNormal = 1;
                         }
                         break;
+    
                     case 'vip':
                         await createSeat({
-                            seat_number: temp,
+                            seat_number: tempVip,
                             seat_row: row_vip,
-                            seat_type: room_seat[i].type,
-                            seat_roomId: newRoom.id 
+                            seat_type_id: new_room_seat_type.seat_type_id,
+                            seat_roomId: newRoom.id
                         });
-                        seatCount++;
-                        temp++;
-                        if (seatCount % 10 === 0) {
+                        seatCountVip++;
+                        tempVip++;
+    
+                        // Sau mỗi 8 ghế, chuyển sang hàng tiếp theo
+                        if (seatCountVip % 8 === 0) {
                             row_vip = String.fromCharCode(row_vip.charCodeAt(0) + 1);
-                            temp = 1;
+                            tempVip = 1;
                         }
                         break;
+    
                     case 'couple':
                         await createSeat({
-                            seat_number: j,
-                            seat_row: 'E',
-                            seat_type: room_seat[i].type,
-                            seat_roomId: newRoom.id 
+                            seat_number: tempCouple,
+                            seat_row: row_couple,
+                            seat_type_id: new_room_seat_type.seat_type_id,
+                            seat_roomId: newRoom.id
                         });
+                        seatCountCouple++;
+                        tempCouple++;
+    
+                        // Sau mỗi 5 ghế, chuyển sang hàng tiếp theo
+                        if (seatCountCouple % 5 === 0) {
+                            row_couple = String.fromCharCode(row_couple.charCodeAt(0) + 1);
+                            tempCouple = 1;
+                        }
                         break;
+    
                     default:
                         break;
                 }
             }
         }
-
+    
         return newRoom;
-    }
+    }    
 
-    static async insertMovieToRoom( payload ){
-        const { roomId, movieId, release_date } = payload;
-        if(!roomId || !movieId) throw new NotFoundError('roomId or movieId invalid!!');
+    static async updateRoom(roomId, payload) {
+        if (!roomId || !payload) throw new BadRequestError('Invalid data provided');
 
-        const foundRoom = await foundRoomById(roomId);
-        if(!foundRoom) throw new BadRequestError('Room not exists!');
+        const { room_name, room_seat_quantity, room_release_date, room_seat } = payload;
+        
+        const foundRoom = await db.Room.findOne({ where: { id: roomId } });
+        if (!foundRoom) throw new BadRequestError('Room not found');
 
-        const foundMovie = await foundMovieById(movieId);
-        if(!foundMovie) throw new BadRequestError('Movie not exists!');
+        const updatedRoom = await foundRoom.update({
+            room_name: room_name || foundRoom.room_name,  
+            room_seat_quantity: room_seat_quantity || foundRoom.room_seat_quantity,
+            room_release_date: room_release_date || foundRoom.room_release_date
+        });
 
-        const dateMovieUsed = new Date(foundRoom.room_release_date).toJSON().slice(0,10);
-        const dateMovieNow = new Date(release_date).toJSON().slice(0,10);
-        if(dateMovieUsed == dateMovieNow) throw new BadRequestError('Movies currently showing cannot be added!');
+        if (room_seat && room_seat.length > 0) {
+            for (let i = 0; i < room_seat.length; i++) {
+                const hasSeatType = await findSeatTypeByName(room_seat[i].type);
+                if (!hasSeatType) throw new BadRequestError('Seat type not found');
 
-        if(foundRoom.room_currently_showing == movieId) throw new BadRequestError('Movie already exists!');
+                const existingRoomSeatType = await db.Room_seat_type.findOne({
+                    where: { room_id: updatedRoom.id, seat_type_id: hasSeatType.id }
+                });
 
-        let movieUsed = [{
-            movieId: foundRoom.room_currently_showing,
-            Date_Show: foundRoom.room_release_date
-        }];
+                if (existingRoomSeatType) {
+                    await existingRoomSeatType.update({ quantity: room_seat[i].quantity });
+                } else {
+                    await db.Room_seat_type.create({
+                        room_id: updatedRoom.id,
+                        seat_type_id: hasSeatType.id,
+                        quantity: room_seat[i].quantity
+                    });
+                }
 
-        if(foundRoom.room_previously_shown != null){
-            if(foundRoom.room_previously_shown.map(item => item.movieId).includes(movieId)) throw new BadRequestError('Movies cannot be shown again!');
-            let previouslyShown = foundRoom.room_previously_shown;
-            movieUsed.push(previouslyShown);
-            movieUsed = movieUsed.flat();
+                let row_vip = 'A', row_normal = 'N', temp = 1, seatCount = 0;
+                for (let j = 1; j <= room_seat[i].quantity; j++) {
+                    switch (room_seat[i].type) {
+                        case 'normal':
+                            await createSeat({
+                                seat_number: temp,
+                                seat_row: row_normal,
+                                seat_type_id: hasSeatType.id,
+                                seat_roomId: updatedRoom.id
+                            });
+                            seatCount++;
+                            temp++;
+                            if (seatCount % 10 === 0) {
+                                row_normal = String.fromCharCode(row_normal.charCodeAt(0) + 1);
+                                temp = 1;
+                            }
+                            break;
+                        case 'vip':
+                            await createSeat({
+                                seat_number: temp,
+                                seat_row: row_vip,
+                                seat_type_id: hasSeatType.id,
+                                seat_roomId: updatedRoom.id
+                            });
+                            seatCount++;
+                            temp++;
+                            if (seatCount % 10 === 0) {
+                                row_vip = String.fromCharCode(row_vip.charCodeAt(0) + 1);
+                                temp = 1;
+                            }
+                            break;
+                        case 'couple':
+                            await createSeat({
+                                seat_number: j,
+                                seat_row: 'E',
+                                seat_type_id: hasSeatType.id,
+                                seat_roomId: updatedRoom.id
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
 
-        // type seat price different
-        let room_price = [];
-        room_price[0] = { price: parseInt(foundMovie.price) + 10 };
-        room_price[1] = { price: parseInt(foundMovie.price) + 15 };
-        room_price[2] = { price: parseInt(foundMovie.price) + 25 };
-          
-        const newRoom = await updateMovieToRoom(foundRoom.id, movieId, dateMovieNow, movieUsed, room_price);
-
-        return newRoom;
+        return updatedRoom;
     }
 
     static async getRoomById( roomId ){
@@ -167,6 +222,22 @@ class RoomService{
 
         return foundRoom;
     }
+
+    static async deleteRoomById(roomId) {
+        if (!roomId) throw new BadRequestError('Room ID is required!');
+    
+        const foundRoom = await db.Room.findOne({ where: { id: roomId } });
+        if (!foundRoom) throw new NotFoundError('Room not found!');
+    
+        await db.Seat.destroy({ where: { seat_roomId: roomId } });
+    
+        await db.Room_seat_type.destroy({ where: { room_id: roomId } });
+    
+        await foundRoom.destroy();
+    
+        return foundRoom
+    }
+    
 }
 
 module.exports = RoomService;

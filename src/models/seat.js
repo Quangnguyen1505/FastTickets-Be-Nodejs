@@ -11,13 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Seat.belongsTo(models.Seat_type, { foreignKey: 'seat_type_id' });
+      Seat.hasMany(models.booking_seat, { foreignKey: 'seat_id' });
     }
   }
   Seat.init({
     seat_row: DataTypes.STRING,
     seat_number: DataTypes.INTEGER,
-    seat_type: DataTypes.STRING,
-    seat_roomId: DataTypes.UUID
+    seat_status: DataTypes.ENUM('available', 'booked', 'reserved', 'unavailable'),
+    seat_roomId: DataTypes.UUID,
+    seat_type_id: DataTypes.UUID,
   }, {
     sequelize,
     modelName: 'Seat',

@@ -22,6 +22,20 @@ class CategoryController {
             metadata: await categoryService.getCategories(req.query)
         }).send(res);
     }
+
+    updateCategories = async (req, res, next) => {
+        new SuccessResponse({
+            message: "update category success",
+            metadata: await categoryService.updateCategory(req.params.id, req.body)
+        }).send(res);
+    }
+
+    deleteCategories = async (req, res, next) => {
+        new SuccessResponse({
+            message: "delete category success",
+            metadata: await categoryService.deleteCategory(req.params.id)
+        }).send(res);
+    }
 }
 
 module.exports = new CategoryController();

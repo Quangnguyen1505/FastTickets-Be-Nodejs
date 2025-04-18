@@ -37,6 +37,30 @@ class CategoryService {
             skip
         });
     }
+
+    static async updateCategory(categoryId, payload) {
+        const { cate_name, cate_description } = payload;
+        const foundCate = await db.category.findByPk(categoryId);
+
+        if (!foundCate) throw new NotFoundError("Category not found");
+
+        const updated = await foundCate.update({
+            cate_name,
+            cate_description,
+            cate_slug: slugify(cate_name)
+        });
+
+        return updated;
+    }
+
+    static async deleteCategory(categoryId) {
+        const foundCate = await db.category.findByPk(categoryId);
+        if (!foundCate) throw new NotFoundError("Category not found");
+
+        await foundCate.destroy();
+
+        return foundCate;
+    }
 }
 
 module.exports = CategoryService

@@ -9,20 +9,14 @@ class RoomController{
         }).send(res);
     }
 
-    // updateCinema = async ( req, res, next ) => {
-    //     const movieId = req.body.movieId, payload = req.body.payload;
-    //     new SuccessResponse({
-    //         message: "update Cinema success",
-    //         metadata: await MovieService.updateMovie( movieId, payload )
-    //     }).send(res);
-    // } 
-
-    insertMovieToRoom = async ( req, res, next ) => {
+    updateRoom = async ( req, res, next ) => {
+        const payload = req.body;
         new SuccessResponse({
-            message: "Insert movie to Room success",
-            metadata: await roomService.insertMovieToRoom(req.body)
+            message: "update Room success",
+            metadata: await roomService.updateRoom( req.params.roomId, payload )
         }).send(res);
     } 
+
 
     getRoomById = async (req,res,next) => {
         new SuccessResponse({
@@ -35,6 +29,13 @@ class RoomController{
         new SuccessResponse({
             message: "get all Room success",
             metadata: await roomService.getAllRoom(req.query)
+        }).send(res);
+    }
+
+    deleteRoom = async (req,res,next) => {
+        new SuccessResponse({
+            message: "delete Room success",
+            metadata: await roomService.deleteRoomById(req.params.roomId)
         }).send(res);
     }
 }

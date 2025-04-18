@@ -3,18 +3,20 @@ const MovieService = require("../services/movie.service");
 
 class MovieController{
     createMovie = async ( req, res, next ) => {
-        const { file, file_video } = req.files;
+        console.log("body and file", req.body, req.file)
+        const filePath = req.file.path;
         new SuccessResponse({
             message: "create movie success",
-            metadata: await MovieService.createMovie(req.body, file ? file[0] : null, file_video ? file_video[0] : null)
+            metadata: await MovieService.createMovie(req.body, filePath)
         }).send(res);
     }
 
     updateMovie = async ( req, res, next ) => {
-        const movieId = req.body.movieId, payload = req.body.payload;
+        const movieId = req.params.id, payload = req.body;
+        const filePath = req.file ? req.file.path : null;
         new SuccessResponse({
             message: "update movie success",
-            metadata: await MovieService.updateMovie( movieId, payload )
+            metadata: await MovieService.updateMovie( movieId, payload, filePath )
         }).send(res);
     } 
 
@@ -29,13 +31,6 @@ class MovieController{
         new SuccessResponse({
             message: "get all movie success",
             metadata: await MovieService.getMovies(req.query)
-        }).send(res);
-    }
-
-    getAllMovieByStatus = async (req,res,next) => {
-        new SuccessResponse({
-            message: "get all movie by status success",
-            metadata: await MovieService.getMoviesByStatus(req.query)
         }).send(res);
     }
 

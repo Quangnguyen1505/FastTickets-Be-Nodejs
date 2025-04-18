@@ -1,79 +1,15 @@
 require('dotenv').config();
-const { 
-    PG_HOST,
-    PG_USER, 
-    PG_PASSWORD, 
-    PG_DATABASE, 
-    PG_DIALECT,
-    PORT,
-    EMAIL_APP_PASSWORD,
-    EMAIL_NAME,
-    URL_SERVER,
-    CLOUDINARY_NAME,
-    CLOUDINARY_API_KEY,
-    CLOUDINARY_API_SECRET,
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    URL_CLIENT,
-    PRO_PG_USER, 
-    PRO_PG_PASSWORD, 
-    PRO_PG_DATABASE,  
-    PRO_PG_HOST,
-    PRO_PG_DIALECT, 
-    PRO_PORT,
-    PRO_EMAIL_APP_PASSWORD, 
-    PRO_EMAIL_NAME,
-    PRO_URL_SERVER,
-    PRO_CLOUDINARY_NAME,
-    PRO_CLOUDINARY_API_KEY,
-    PRO_CLOUDINARY_API_SECRET,
-    PRO_GOOGLE_CLIENT_ID,
-    PRO_GOOGLE_CLIENT_SECRET,
-    PRO_URL_CLIENT,
-} = process.env;
 
-const development = {
-    username: PG_USER || 'postgres',
-    password: PG_PASSWORD || '1',
-    database: PG_DATABASE || 'db',
-    host: PG_HOST || 'localhost',
-    dialect: PG_DIALECT || 'postgres',
-    logging: false,
-    timezone: '+07:00',
-    role_user: 1,
-    port: PORT || '4200',
-    email_app_password: EMAIL_APP_PASSWORD || 'abc@gmail.com',
-    email_name: EMAIL_NAME || 'abc@gmail.com',
-    url_server: URL_SERVER || 'http://localhost:4200',
-    cloudinary_name: CLOUDINARY_NAME,
-    cloudinary_api_key: CLOUDINARY_API_KEY ,
-    cloudinary_api_secret: CLOUDINARY_API_SECRET,
-    google_client_id: GOOGLE_CLIENT_ID,
-    google_client_secret: GOOGLE_CLIENT_SECRET,
-    url_client: URL_CLIENT || 'http://localhost:3000',
+const { PG_HOST ,PG_USER, PG_PASSWORD, PG_DATABASE, PG_DIALECT } = process.env;
+module.exports = {
+    development: {
+        username: PG_USER,
+        password: PG_PASSWORD,
+        database: PG_DATABASE,
+        host: PG_HOST,
+        dialect: PG_DIALECT,
+        logging: false,
+        timezone: '+07:00',
+        role_user: 1
+    }
 }
-
-const production = {
-    username: PRO_PG_USER || 'postgres',
-    password: PRO_PG_PASSWORD || '1',
-    database: PRO_PG_DATABASE || 'db',
-    host: PRO_PG_HOST || 'localhost',
-    dialect: PRO_PG_DIALECT || 'postgres',
-    logging: false,
-    timezone: '+07:00',
-    role_user: 1,
-    port: PRO_PORT || '4200',
-    email_app_password: PRO_EMAIL_APP_PASSWORD || 'abc@gmail.com',
-    email_name: PRO_EMAIL_NAME || 'abc@gmail.com',
-    url_server: PRO_URL_SERVER || 'http://localhost:4200',
-    cloudinary_name: PRO_CLOUDINARY_NAME,
-    cloudinary_api_key: PRO_CLOUDINARY_API_KEY ,
-    cloudinary_api_secret: PRO_CLOUDINARY_API_SECRET,
-    google_client_id: PRO_GOOGLE_CLIENT_ID,
-    google_client_secret: PRO_GOOGLE_CLIENT_SECRET,
-    url_client: PRO_URL_CLIENT || 'http://localhost:3000',
-}
-
-const config = { development, production }
-const env = process.env.NODE_ENV || 'development'
-module.exports = config[env]

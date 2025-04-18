@@ -5,20 +5,19 @@ const crypto = require('crypto');
 const KeyTokenServices = require("./keyToken.service");
 const { getInfoData } = require("../utils");
 const db = require('../models');
-const { findByEmail, findByUserId, updateUserByUserId } = require("../models/repo/accsess.repo");
+const { findByEmail } = require("../models/repo/accsess.repo");
 const userValidate = require("../helper/validation");
 const { development } = require("../config/config");
+const { getRoleByName } = require("./role.service");
+const { CACHE_USER } = require("../config/constant");
+const { setHashValue, deleteHashField } = require("../models/repo/cache/cache.redis");
 
-RoleShop = {
-    SHOP:'SHOP',
-    WRITER:'WRITER',
-    EDITOR: 'EDITOR',
-    ADMIN: 'ADMIN'
+const Role = {
+    USER:'User',
 }
 
 class AccessService {
     static login = async ({ email, password, refreshToken = null })=>{
-        console.log("login::", { email, password, refreshToken });
         /*
            1. Check email in dbs
            2. match password
@@ -32,7 +31,7 @@ class AccessService {
 
        console.log("foundShop::", foundUser);
 
-       const match = await bcrypt.compare( password, foundUser.password );
+       const match = await bcrypt.compare( password, foundUser.usr_password );
        if(!match) throw new AuthFailureError('Authencation error');
 
 
@@ -41,97 +40,111 @@ class AccessService {
 
     
        const { id: userId } = foundUser;
-       const tokens = await createTokenPair({ userId, email }, publicKey, privateKey );
-       
-       await KeyTokenServices.createKeyToken({
-           refreshToken: tokens.refreshToken,
-           userId,
-           publicKey,
-           privateKey,
-       })
+       const payload = {
+            sub: userId,
+            email,
+       } 
+       const tokens = await createTokenPair(payload, publicKey, privateKey );
+       const keyUser = `${CACHE_USER.user}${userId}`
+       if(tokens) {
+        await KeyTokenServices.createKeyToken({
+            refreshToken: tokens.refreshToken,
+            userId,
+            publicKey,
+            privateKey,
+        })
+        await setHashValue(
+            keyUser, 
+            'accessToken', 
+            tokens.accessToken, 
+            'refreshToken', 
+            tokens.refreshToken,
+            'publicKey',
+            publicKey
+        )
+       }
 
        return {
-           shop: getInfoData({ fileds:['id', 'name', 'email'], object:foundUser }),
+           shop: getInfoData({ fileds:['id', 'email'], object:foundUser }),
            tokens
        }
    }
 
-   static signUp = async ({ name, email, password, address})=>{
-            const { error } = userValidate({ email, password });
-            if( error ) throw new NotFoundError(error.details[0].message);
-            
-            const foundUser= await db.User.findOne({
-                where: {email: email},
-            })
-            if(foundUser){
-                throw new BadRequestError('Error: Shop already registered!');
-            }
+   static signUp = async ({ email, password })=>{
+    const { error } = userValidate({ email, password });
+    if( error ) throw new NotFoundError(error.details[0].message);
     
-            const salt = 10;
-            const passwordHash = await bcrypt.hash(password, salt);
+    const foundUser= await db.User.findOne({
+        where: {usr_email: email},
+    })
+    if(foundUser){
+        throw new BadRequestError('Error: Shop already registered!');
+    }
 
-            const newUser = await db.User.create({ name, email, password: passwordHash, address, role: development.role_user });
+    const foundRole = await getRoleByName(Role.USER)
+    if(!foundRole) throw new BadRequestError('Role not exists')
 
-           if(newUser){
+    const salt = 10;
+    const passwordHash = await bcrypt.hash(password, salt);
 
-               const privateKey = crypto.randomBytes(64).toString('hex');
-               const publicKey = crypto.randomBytes(64).toString('hex');
-               console.log({privateKey,publicKey});
+    const newUser = await db.User.create({ 
+        usr_email: email, 
+        usr_password: passwordHash, 
+        usr_salf: salt,
+        usr_role_id: foundRole.id
+    });
 
-               const keyUser = await KeyTokenServices.createKeyToken({
-                   userId:newUser.id,
-                   publicKey,
-                   privateKey
-               });
-               if(!keyUser){
-                   throw new BadRequestError('Error: keyUser error!');
-               }
+    if(newUser){
 
-               const tokens = await createTokenPair({ userId:newUser.id, email }, publicKey, privateKey );
-               console.log("tokens create successfully!", tokens);
+        const privateKey = crypto.randomBytes(64).toString('hex');
+        const publicKey = crypto.randomBytes(64).toString('hex');
+        console.log({privateKey,publicKey});
 
-               return {
-                    shop: getInfoData({ fileds:['id', 'name', 'email'], object:newUser }),
-                    tokens
-               }
-           }
-           return null;
+        const newTokens = await KeyTokenServices.createKeyToken({
+            userId:newUser.id,
+            publicKey,
+            privateKey
+        });
+        if(!newTokens){
+            throw new BadRequestError('Error: newTokens save error!');
+        }
+        const payload = {
+            sub: newUser.id,
+            email,
+       } 
+        const tokens = await createTokenPair(payload, publicKey, privateKey );
+        console.log("tokens create successfully!", tokens);
+        if(!tokens) {
+            throw new BadRequestError("token create failed!");
+        }
+
+        const keyUser = `${CACHE_USER.user}${newUser.id}`
+        await setHashValue(
+            keyUser, 
+            'accessToken', 
+            tokens.accessToken, 
+            'refreshToken', 
+            tokens.refreshToken, 
+            'publicKey',
+            newTokens.publicKey
+        )
+
+        return {
+            shop: getInfoData({ fileds:['id', 'usr_email'], object:newUser }),
+            tokens
+        }
+    }
+    return null;
    }
 
    static logout = async ( keyStore ) => {
         const delKey = await KeyTokenServices.removeToken(keyStore.id);
+        if(delKey) {
+            await deleteHashField(`${CACHE_USER.user}${keyStore.id}`, 'accessToken');
+            await deleteHashField(`${CACHE_USER.user}${keyStore.id}`, 'refreshToken');
+            await deleteHashField(`${CACHE_USER.user}${keyStore.id}`, 'publicKey');
+        }
         return delKey;
-   }
-
-   static getProfile = async ( userId )=>{
-        const foundUser = await findByUserId({userId});
-        if(!foundUser) throw new BadRequestError('User is not registered');
-        return foundUser;
-   }
-
-   static changePassword = async ({ email, old_password, new_password }) => {
-
-        const foundUser = await findByEmail({ email });
-        if(!foundUser) throw new BadRequestError('Shop is not registered');
-        
-        const match = await bcrypt.compare( old_password, foundUser.password );
-        console.log("match::", match);
-        
-        if(!match) throw new AuthFailureError('Authencation error');
-
-        const salt = 10;
-        const password = await bcrypt.hash(new_password, salt);
-    
-        const updateNewPassword = await updateUserByUserId({userId: foundUser.id, payload: {password}});
-        return updateNewPassword;
-   }
-
-   static updateUser = async ({ userId, payload }) => {
-        const foundUser = await findByUserId({userId}); 
-        if(!foundUser) throw new BadRequestError('User is not registered');
-
-        const updateUser = await updateUserByUserId({userId, payload});
-        return updateUser;
    }
 
 }

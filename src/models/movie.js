@@ -11,29 +11,31 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Movie.hasMany(models.Room, { foreignKey: 'room_currently_showing' });
-      Movie.belongsTo(models.category, { foreignKey: 'movie_categoryId' });
+      Movie.hasMany(models.Showtime, { foreignKey: 'movie_id' });
+      Movie.hasMany(models.movie_category, { foreignKey: 'movie_id' });
+      Movie.hasMany(models.Booking, { foreignKey: 'booking_movieId' });
     }
   }
   Movie.init({
-    title: DataTypes.STRING,
-    image: DataTypes.STRING,
-    video_trailer: DataTypes.STRING,
-    content: DataTypes.STRING,
-    time: DataTypes.STRING,
-    director: DataTypes.STRING,
-    performer: DataTypes.STRING,
-    price: DataTypes.STRING,
-    movie_categoryId: DataTypes.UUID,
-    movie_status: DataTypes.ENUM("dangchieu", "sapchieu", "dachieu"),
-    country: DataTypes.STRING
+    movie_title: DataTypes.STRING,
+    movie_image_url: DataTypes.STRING,
+    movie_video_trailer_code: DataTypes.STRING,
+    movie_content: DataTypes.TEXT,
+    movie_time: DataTypes.INTEGER,
+    movie_director: DataTypes.STRING,
+    movie_performer: DataTypes.STRING,
+    movie_price: DataTypes.INTEGER,
+    movie_status: DataTypes.ENUM("now-showing", "upcoming-movies", "past-movies"),
+    movie_country: DataTypes.STRING,
+    movie_age_rating: DataTypes.ENUM("K", "T13", "T16", "T18"),
+    movie_release_date: DataTypes.DATEONLY,
   }, {
     sequelize,
     modelName: 'Movie',
     indexes: [
       {
         unique: false,
-        fields: ['title']
+        fields: ['movie_title']
       }
     ]
   });

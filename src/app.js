@@ -5,7 +5,7 @@ var morgan = require('morgan');
 var helmet =require('helmet');
 var compression = require('compression')
 const cors = require('cors');
-const dbconn = require('./db/init.postgresql');
+const dbconn = require('./dbs/init.postgresql');
 const cookieParser = require('cookie-parser')
 const swaggerUi = require('swagger-ui-express');
 
@@ -18,10 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }))
-// app.use(cors({
-//     origin: 'http://localhost:4200', 
-//     credentials: true 
-// }));
+
 app.use(cors({
     origin: '*', 
     credentials: true 
@@ -34,6 +31,12 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
 //init db
 dbconn();
+
+//init db
+const initIoRedis = require('./dbs/init.redis');
+initIoRedis.init({
+    IOREDIS_IS_ENABLED: true
+})
 
 //init passport
 require('./config/passportAuth.config');

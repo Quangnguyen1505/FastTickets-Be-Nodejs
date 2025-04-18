@@ -5,7 +5,10 @@ const { handlerError } = require('../../helper/asyncHandler');
 const { authencationV2 } = require('../../auth/authUtils');
 
 router.use(authencationV2)
-router.post("/create", authencationV2, handlerError(roleController.newRole));
-router.get("/get/:id", authencationV2, handlerError(roleController.getRoleById));
+router.post("", handlerError(roleController.newRole));
+router.get("/:id", handlerError(roleController.getRoleById));
+router.get("", handlerError(roleController.getAllRole));
+router.put("/:id", handlerError(roleController.updateRole));
+router.delete("/:id", handlerError(roleController.deleteRole));
 
 module.exports = router;

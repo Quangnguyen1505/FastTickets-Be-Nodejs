@@ -9,7 +9,7 @@ class KeyTokenServices {
             };
             createToken = await db.keyToken.findOrCreate({
                 where: fitler,
-                defaults: { userId, publicKey, privateKey, refreshToken }
+                defaults: { user_id: userId, publicKey, privateKey, refreshToken }
             });
 
             if(!createToken[1]){

@@ -16,33 +16,12 @@ module.exports = {
       room_seat_quantity: {
         type: Sequelize.INTEGER
       },
-      room_seat_type: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
-      },
       room_status: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },
-      room_currently_showing: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'Movies',
-          key: 'id'
-        }
-      },
-      room_price_currently_showing: {
-        type: Sequelize.ARRAY(Sequelize.JSON),
-        defaultValue: []
-      },
-      room_previously_shown: {
-        type: Sequelize.ARRAY(Sequelize.JSON),
-        defaultValue: []
-      },
       room_release_date: {
         type: Sequelize.DATE
-      },
-      room_show_times: {
-        type: Sequelize.ARRAY(Sequelize.DATE)
       },
       createdAt: {
         allowNull: false,

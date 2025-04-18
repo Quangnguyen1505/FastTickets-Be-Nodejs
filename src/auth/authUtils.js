@@ -45,16 +45,17 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
       5. Check key Store with this userId
       6. OK all => return next()
     */
-    // const userId = req.headers[HEADER.CLIENT_ID];
-    const userId = req.cookies[HEADER.CLIENT_ID];
+    const userId = req.headers[HEADER.CLIENT_ID];
+    
+    // const userId = req.cookies[HEADER.CLIENT_ID];
     // if( !userId ) throw new AuthFailureError('Invalid Request');
     if( !userId ) return;
     
     const keyStore = await findByUserId(userId);
-    console.log("keyStore::", keyStore);
+    // console.log("keyStore::", keyStore);
     if(!keyStore) throw new NotFoundError('Not Found keyStore');
-    // const refreshToken = req.headers[HEADER.REFRESHTOKEN];
-    const refreshToken = req.cookies[HEADER.REFRESHTOKEN];
+    const refreshToken = req.headers[HEADER.REFRESHTOKEN];
+    // const refreshToken = req.cookies[HEADER.REFRESHTOKEN];
     if(refreshToken){
         try {
 
@@ -72,20 +73,19 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
         }
     }
 
-    // const accessToken = req.headers[HEADER.AUTHORIZATION];
-    
-    const accessToken = req.cookies[HEADER.AUTHORIZATION];
-    if( !accessToken ) throw new AuthFailureError('Invalid Request');
-    // const extractedToken = accessToken.split(' ')[1]; // bearer
+    const headerToken = req.headers[HEADER.AUTHORIZATION];
+    // const accessToken = req.cookies[HEADER.AUTHORIZATION];
+    if( !headerToken ) throw new AuthFailureError('Invalid Request');
+    const accessToken = headerToken.split(' ')[1];
     try {
 
         const decodeUser = JWT.verify( accessToken, keyStore.publicKey );
         console.log("decode::", decodeUser);
         
-        if( userId != decodeUser.userId ) throw new AuthFailureError('Invalid UserId');
-
+        if( userId != decodeUser.sub ) throw new AuthFailureError('Invalid UserId');
+        
         req.keyStore = keyStore;
-        req.userId = decodeUser.userId;
+        req.userId = decodeUser.sub;
         req.user = decodeUser;
         req.email = decodeUser.email;
         return next();

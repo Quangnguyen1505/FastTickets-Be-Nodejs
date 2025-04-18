@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Bookings', {
+    await queryInterface.createTable('showtime_pricings', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.literal("gen_random_uuid()"),
@@ -10,35 +10,22 @@ module.exports = {
         autoIncrement: false,
         primaryKey: true,
       },
-      booking_roomId: {
+      show_time_id: {
         type: Sequelize.UUID,
         references: {
-          model: 'Rooms',
+          model: 'Showtimes',
           key: 'id'
         }
       },
-      booking_seats: {
-        type: Sequelize.ARRAY(Sequelize.JSONB)
-      },
-      booking_movieId: {
+      seat_type_id: {
         type: Sequelize.UUID,
         references: {
-          model: 'Movies',
+          model: 'Seat_types',
           key: 'id'
         }
       },
-      booking_userId: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'Users',
-          key: 'id'
-        }
-      },
-      booking_address: {
-        type: Sequelize.STRING
-      },
-      booking_total_checkout: {
-        type: Sequelize.INTEGER
+      surcharge: {
+        type: Sequelize.FLOAT
       },
       createdAt: {
         allowNull: false,
@@ -51,6 +38,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Bookings');
+    await queryInterface.dropTable('showtime_pricings');
   }
 };
