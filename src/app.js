@@ -8,7 +8,8 @@ const cors = require('cors');
 const dbconn = require('./dbs/init.postgresql');
 const cookieParser = require('cookie-parser')
 const swaggerUi = require('swagger-ui-express');
-
+const initIoRedis = require('./dbs/init.redis');
+const { connectToRabbitMQ } = require('./queue/init.queue');
 
 //init middelwares
 app.use(morgan("dev"));
@@ -27,16 +28,19 @@ app.use(cookieParser());
 
 //init swagger ui
 const { openApiDoc } = require('./config/swaggerDoc.config');
+const { sendMailPersonalProducer } = require('./queue/services/sendMailBooking');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
 //init db
 dbconn();
 
 //init db
-const initIoRedis = require('./dbs/init.redis');
 initIoRedis.init({
     IOREDIS_IS_ENABLED: true
 })
+
+//init rabbitmq
+connectToRabbitMQ()
 
 //init passport
 require('./config/passportAuth.config');

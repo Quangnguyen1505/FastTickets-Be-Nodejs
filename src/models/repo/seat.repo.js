@@ -11,7 +11,7 @@ const findSeatById = (seatId) => {
     })
 }
 
-const findSeatByCode = async (seatCode) => {
+const findSeatByCode = async (seatCode, seat_status) => {
     // Tách row (chữ cái) và number (số)
     const match = seatCode.match(/^([A-Za-z]+)(\d+)$/);
     if (!match) throw new Error("Invalid seat code format");
@@ -24,7 +24,7 @@ const findSeatByCode = async (seatCode) => {
       where: {
         seat_row,
         seat_number,
-        seat_status: 'available'
+        seat_status
       }
     });
 };

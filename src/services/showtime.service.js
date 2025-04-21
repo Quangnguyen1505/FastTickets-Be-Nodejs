@@ -73,12 +73,22 @@ class ShowTimeService {
     static async deleteShowTime(showtime_id) {
         const foundShowTime = await findShowTimeById(showtime_id);
         if (!foundShowTime) throw new BadRequestError('Showtime not found');
-
-        const deleteShowTime = await db.Showtime.destroy({ where: { id: showtime_id } });
+    
+        // Xoá tất cả các showtime_pricings liên quan trước
+        await db.showtime_pricing.destroy({
+            where: { show_time_id: showtime_id }
+        });
+    
+        // Xoá showtime
+        const deleteShowTime = await db.Showtime.destroy({
+            where: { id: showtime_id }
+        });
+    
         if (!deleteShowTime) throw new BadRequestError('Delete failed');
-
-        return deleteShowTime;
+    
+        return deleteShowTime
     }
+    
 
     static async getTicketPrice (showtimeId, seatTypeId) {
         const showtime = await db.Showtime.findOne({

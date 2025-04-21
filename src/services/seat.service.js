@@ -57,6 +57,19 @@ class SeatService {
         return foundAll;
     }
     
+    static async updateStatusSeat(seatId, seat_status) {
+        const foundSeat = await findSeatById(seatId);
+        if (!foundSeat) throw new BadRequestError('Seat not exists!!');
+
+        const updatedSeat = await db.Seat.update(
+            { seat_status },
+            { where: { id: seatId } }
+        );
+
+        if (!updatedSeat) throw new BadRequestError('Update failed!!');
+
+        return updatedSeat;
+    }
     
 }
 

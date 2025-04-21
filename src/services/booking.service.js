@@ -5,6 +5,8 @@ const { foundRoomById } = require("../models/repo/room.repo");
 const { findSeatByCode } = require("../models/repo/seat.repo");
 const { findSeatTypeByName } = require("../models/repo/seat_type.repo");
 const { findShowTimeById } = require("../models/repo/showtime.repo");
+const { sendMailPersonalProducer } = require("../queue/services/sendMailBooking");
+const { updateStatusSeat } = require("./seat.service");
 const { getTicketPrice } = require("./showtime.service");
 
 class BookingService {
@@ -33,7 +35,7 @@ class BookingService {
         let total_Price = [];
 
         for (let i = 0; i < user_order.length; i++) {
-            let foundSeat = await findSeatByCode(user_order[i].location);
+            let foundSeat = await findSeatByCode(user_order[i].location, 'available');
             if (!foundSeat) throw new BadRequestError(`Seat ${user_order[i].location} not exists!!`);
     
             let seat_types = await findSeatTypeByName(user_order[i].type);
@@ -41,7 +43,9 @@ class BookingService {
     
             let price_ticket = await getTicketPrice(foundShowtime.id, seat_types.id);
             total_Price.push(price_ticket);
-    
+            user_order[i].price = price_ticket;
+            user_order[i].quantity = 1;
+            user_order[i].stt = Number(i) + Number(1);
             user_order[i].seat_id = foundSeat.id; 
         }
     
@@ -54,7 +58,8 @@ class BookingService {
             show_time_id: foundShowtime.id,
             movie: {
                 movie_id: foundShowtime.Movie.id,
-                movie_title: foundShowtime.Movie.movie_title
+                movie_title: foundShowtime.Movie.movie_title,
+                age_rating: foundShowtime.Movie.movie_age_rating
             },
             room: {
                 room_id: foundShowtime.Room.id,
@@ -68,12 +73,12 @@ class BookingService {
         return {
             checkoutPrice,
             user_order,
-            showtime
+            showtime,
         }
 
     }
 
-    static async createBooking({ userId, payload }) { 
+    static async createBooking({ userId, email, payload }) { 
         const { show_time_id, user_order_book } = payload;
         const { checkoutPrice, showtime, user_order } = await BookingService.checkoutReviewBooking({
             show_time_id, payload: {
@@ -81,6 +86,13 @@ class BookingService {
             }
         });
         if(!checkoutPrice) throw new NotFoundError("checkout price not exists!!");
+
+
+        //check seat exists
+        for (let i = 0; i < user_order.length; i++) {
+            let foundSeat = await findSeatByCode(user_order[i].location, "booked");
+            if (foundSeat) throw new BadRequestError(`Seat ${user_order[i].location} already booked!!`);
+        }
     
         const newBooking = await db.Booking.create({
             booking_roomId: showtime.room.room_id,
@@ -98,8 +110,46 @@ class BookingService {
                 seat_id: user_order[i].seat_id
             })
             if(!newBookingSeat) throw new BadRequestError("new booking seat error")
+
+            //update status seat 
+            const seat_status = "booked"
+            await updateStatusSeat(user_order[0].seat_id, seat_status);
         }
-    
+        // send mail 
+        // send mail to user booking success
+        const message = {
+            email: email,
+            booking_id: newBooking.id,
+            movie_title: showtime.movie.movie_title,
+            age_rating: showtime.movie.age_rating,
+            room_name: showtime.room.room_name,
+            show_date: showtime.show_date,
+            start_time: showtime.start_time,
+            seat_number: user_order.length,
+            booking: [
+                ...user_order.map(item => {
+                    return {
+                        seat: item.location,
+                        quantity: item.quantity,
+                        price: item.price,
+                        stt: item.stt,
+                    }
+                })
+            ],
+            total_price: newBooking.booking_total_checkout
+        }
+
+        console.log("message", message);
+        const nameQueue = "email_queue"
+        const exchange = "email_exchange"
+        const routingKey = "booking.success"
+        await sendMailPersonalProducer({
+            message: message,
+            nameQueue,
+            exchange,
+            routingKey
+        })
+
         return newBooking
     }
 

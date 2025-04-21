@@ -12,7 +12,7 @@ class BookingController{
     createBooking = async ( req, res, next ) => {
         new SuccessResponse({
             message: "create booking success",
-            metadata: await bookingService.createBooking({ userId: req.user.userId, payload: req.body })
+            metadata: await bookingService.createBooking({ userId: req.userId, email: req.email, payload: req.body })
         }).send(res);
     }
 

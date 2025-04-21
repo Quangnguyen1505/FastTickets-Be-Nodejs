@@ -23,7 +23,7 @@ const findShowTimeById = async (showtime_id) => {
             {
                 model: db.Movie,
                 as: 'Movie', 
-                attributes: ['id', 'movie_title']
+                attributes: ['id', 'movie_title', 'movie_age_rating']
             },
             {
                 model: db.Room,
