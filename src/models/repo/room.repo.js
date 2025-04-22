@@ -14,6 +14,11 @@ const foundRoomById = async ( roomId ) => {
                     attributes: ['name'] 
                 }
             ]
+        }, {
+            
+            model: db.Seat,
+            as: 'Seats',
+            attributes: ['seat_row', 'seat_number', 'seat_status'] 
         }],
     });
 

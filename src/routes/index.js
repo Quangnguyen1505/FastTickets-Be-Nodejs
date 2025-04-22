@@ -5,7 +5,6 @@ router.use('/v1/api/access', require('./Access'));
 router.use('/v1/api/users', require('./Users'));
 router.use('/v1/api/roles', require('./Role'));
 router.use('/v1/api/oauth', require('./Oauth2'));
-router.use('/v1/api/events', require('./Event'));
 router.use('/v1/api/movies', require('./Movie'));
 router.use('/v1/api/showtimes', require('./Showtime'));
 router.use('/v1/api/categories', require('./Category'));

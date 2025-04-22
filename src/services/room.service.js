@@ -27,14 +27,14 @@ const { findSeatTypeByName } = require('../models/repo/seat_type.repo');
 class RoomService{
     static async createRoom(payload) {
         if (!payload) throw new NotFoundError('Variable invalid!!');
-        
+    
         const { room_name, room_seat_quantity, room_release_date, room_seat } = payload;
     
         console.log(room_name);
         const foundRoom = await db.Room.findOne({ where: { room_name } });
     
         if (foundRoom) throw new BadRequestError('Room already exists!');
-        
+    
         const newRoom = await db.Room.create({
             room_name,
             room_seat_quantity,
@@ -43,8 +43,38 @@ class RoomService{
     
         if (!newRoom) throw new BadRequestError('New Room failed!!');
     
-        // Đặt các hàng bắt đầu từ A cho ghế normal, D cho ghế vip, và H cho ghế couple
-        let row_normal = 'A', row_vip = 'D', row_couple = 'H';
+        // Cấu hình số ghế mỗi hàng
+        const SEAT_PER_ROW_NORMAL = 8;
+        const SEAT_PER_ROW_VIP = 8;
+        const SEAT_PER_ROW_COUPLE = 8;
+    
+        // Đếm tổng ghế theo loại
+        let totalNormal = 0, totalVip = 0, totalCouple = 0;
+    
+        for (let i = 0; i < room_seat.length; i++) {
+            switch (room_seat[i].type) {
+                case 'normal':
+                    totalNormal += room_seat[i].quantity;
+                    break;
+                case 'vip':
+                    totalVip += room_seat[i].quantity;
+                    break;
+                case 'couple':
+                    totalCouple += room_seat[i].quantity;
+                    break;
+            }
+        }
+    
+        // Tính số hàng mỗi loại
+        const rowCountNormal = Math.ceil(totalNormal / SEAT_PER_ROW_NORMAL);
+        const rowCountVip = Math.ceil(totalVip / SEAT_PER_ROW_VIP);
+    
+        // Tính hàng bắt đầu cho từng loại
+        let row_normal = 'A';
+        let row_vip = String.fromCharCode('A'.charCodeAt(0) + rowCountNormal);
+        let row_couple = String.fromCharCode(row_vip.charCodeAt(0) + rowCountVip);
+    
+        // Đếm ghế và vị trí từng loại
         let seatCountNormal = 0, seatCountVip = 0, seatCountCouple = 0;
         let tempNormal = 1, tempVip = 1, tempCouple = 1;
     
@@ -72,8 +102,7 @@ class RoomService{
                         seatCountNormal++;
                         tempNormal++;
     
-                        // Sau mỗi 8 ghế, chuyển sang hàng tiếp theo
-                        if (seatCountNormal % 8 === 0) {
+                        if (seatCountNormal % SEAT_PER_ROW_NORMAL === 0) {
                             row_normal = String.fromCharCode(row_normal.charCodeAt(0) + 1);
                             tempNormal = 1;
                         }
@@ -89,8 +118,7 @@ class RoomService{
                         seatCountVip++;
                         tempVip++;
     
-                        // Sau mỗi 8 ghế, chuyển sang hàng tiếp theo
-                        if (seatCountVip % 8 === 0) {
+                        if (seatCountVip % SEAT_PER_ROW_VIP === 0) {
                             row_vip = String.fromCharCode(row_vip.charCodeAt(0) + 1);
                             tempVip = 1;
                         }
@@ -106,8 +134,7 @@ class RoomService{
                         seatCountCouple++;
                         tempCouple++;
     
-                        // Sau mỗi 5 ghế, chuyển sang hàng tiếp theo
-                        if (seatCountCouple % 5 === 0) {
+                        if (seatCountCouple % SEAT_PER_ROW_COUPLE === 0) {
                             row_couple = String.fromCharCode(row_couple.charCodeAt(0) + 1);
                             tempCouple = 1;
                         }
@@ -124,85 +151,95 @@ class RoomService{
 
     static async updateRoom(roomId, payload) {
         if (!roomId || !payload) throw new BadRequestError('Invalid data provided');
-
+    
         const { room_name, room_seat_quantity, room_release_date, room_seat } = payload;
         
         const foundRoom = await db.Room.findOne({ where: { id: roomId } });
         if (!foundRoom) throw new BadRequestError('Room not found');
-
+    
+        // Update basic room details
         const updatedRoom = await foundRoom.update({
             room_name: room_name || foundRoom.room_name,  
             room_seat_quantity: room_seat_quantity || foundRoom.room_seat_quantity,
             room_release_date: room_release_date || foundRoom.room_release_date
         });
-
+    
+        // Update seats if provided
         if (room_seat && room_seat.length > 0) {
+            // Remove old seat types if any
+            await db.Room_seat_type.destroy({ where: { room_id: updatedRoom.id } });
+    
+            // Loop through each seat type and update accordingly
             for (let i = 0; i < room_seat.length; i++) {
                 const hasSeatType = await findSeatTypeByName(room_seat[i].type);
                 if (!hasSeatType) throw new BadRequestError('Seat type not found');
-
-                const existingRoomSeatType = await db.Room_seat_type.findOne({
-                    where: { room_id: updatedRoom.id, seat_type_id: hasSeatType.id }
+    
+                // Create or update the seat type
+                const newRoomSeatType = await db.Room_seat_type.create({
+                    room_id: updatedRoom.id,
+                    seat_type_id: hasSeatType.id,
+                    quantity: room_seat[i].quantity
                 });
-
-                if (existingRoomSeatType) {
-                    await existingRoomSeatType.update({ quantity: room_seat[i].quantity });
-                } else {
-                    await db.Room_seat_type.create({
-                        room_id: updatedRoom.id,
-                        seat_type_id: hasSeatType.id,
-                        quantity: room_seat[i].quantity
-                    });
-                }
-
-                let row_vip = 'A', row_normal = 'N', temp = 1, seatCount = 0;
-                for (let j = 1; j <= room_seat[i].quantity; j++) {
+    
+                // Seat numbering logic based on seat type
+                let row_normal = 'A', row_vip = 'B', row_couple = 'C', temp = 1, seatCount = 0;
+                for (let j = 0; j < room_seat[i].quantity; j++) {
                     switch (room_seat[i].type) {
                         case 'normal':
                             await createSeat({
                                 seat_number: temp,
                                 seat_row: row_normal,
-                                seat_type_id: hasSeatType.id,
+                                seat_type_id: newRoomSeatType.seat_type_id,
                                 seat_roomId: updatedRoom.id
                             });
                             seatCount++;
                             temp++;
-                            if (seatCount % 10 === 0) {
+                            if (seatCount % 8 === 0) {  // Adjust this to match SEAT_PER_ROW_NORMAL
                                 row_normal = String.fromCharCode(row_normal.charCodeAt(0) + 1);
                                 temp = 1;
                             }
                             break;
+    
                         case 'vip':
                             await createSeat({
                                 seat_number: temp,
                                 seat_row: row_vip,
-                                seat_type_id: hasSeatType.id,
+                                seat_type_id: newRoomSeatType.seat_type_id,
                                 seat_roomId: updatedRoom.id
                             });
                             seatCount++;
                             temp++;
-                            if (seatCount % 10 === 0) {
+                            if (seatCount % 8 === 0) {  // Adjust this to match SEAT_PER_ROW_VIP
                                 row_vip = String.fromCharCode(row_vip.charCodeAt(0) + 1);
                                 temp = 1;
                             }
                             break;
+    
                         case 'couple':
                             await createSeat({
-                                seat_number: j,
-                                seat_row: 'E',
-                                seat_type_id: hasSeatType.id,
+                                seat_number: temp,
+                                seat_row: row_couple,
+                                seat_type_id: newRoomSeatType.seat_type_id,
                                 seat_roomId: updatedRoom.id
                             });
+                            seatCount++;
+                            temp++;
+                            if (seatCount % 8 === 0) {  // Adjust this to match SEAT_PER_ROW_COUPLE
+                                row_couple = String.fromCharCode(row_couple.charCodeAt(0) + 1);
+                                temp = 1;
+                            }
                             break;
+    
                         default:
                             break;
                     }
                 }
             }
         }
-
+    
         return updatedRoom;
     }
+    
 
     static async getRoomById( roomId ){
         if(!roomId) throw new NotFoundError('seatId invalid!!');
