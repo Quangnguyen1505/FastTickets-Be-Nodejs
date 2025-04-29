@@ -28,7 +28,6 @@ app.use(cookieParser());
 
 //init swagger ui
 const { openApiDoc } = require('./config/swaggerDoc.config');
-const { sendMailPersonalProducer } = require('./queue/services/sendMailBooking');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
 //init db
@@ -43,7 +42,8 @@ initIoRedis.init({
 connectToRabbitMQ()
 
 //init passport
-require('./config/passportAuth.config');
+require('./config/passportOAuth-gg.config');
+require('./config/passportOauth-fb.config');
 
 //init routes
 app.use('/', require('./routes'))

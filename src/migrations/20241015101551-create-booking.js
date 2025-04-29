@@ -38,7 +38,7 @@ module.exports = {
         type: Sequelize.FLOAT
       },
       booking_status: {
-        type: Sequelize.ENUM('pending', 'confirmed', 'cancelled', 'completed'),
+        type: Sequelize.ENUM('pending', 'paid', 'confirmed', 'cancelled', 'completed'),
         defaultValue: 'pending'
       },
       booking_show_time_id: {
@@ -47,6 +47,26 @@ module.exports = {
           model: 'Showtimes',
           key: 'id'
         }
+      },
+      payment_method: {
+        type: Sequelize.ENUM('momo', 'vnpay', 'zalopay', 'cash'),
+        allowNull: false
+      },
+      payment_order_id: {
+        type: Sequelize.STRING,
+        unique: true
+      },
+      payment_transaction_id: { 
+        type: Sequelize.STRING
+      },
+      payment_result_code: { 
+        type: Sequelize.STRING
+      },
+      payment_message: { 
+        type: Sequelize.STRING
+      },
+      paid_at: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,

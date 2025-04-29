@@ -25,7 +25,13 @@ module.exports = (sequelize, DataTypes) => {
     booking_date: DataTypes.STRING,
     booking_total_checkout: DataTypes.FLOAT,
     booking_status: DataTypes.ENUM('pending', 'confirmed', 'cancelled', 'completed'),
-    booking_show_time_id: DataTypes.STRING
+    booking_show_time_id: DataTypes.STRING,
+    payment_method: DataTypes.ENUM('momo', 'vnpay', 'zalopay', 'cash'),
+    payment_order_id: DataTypes.STRING,
+    payment_transaction_id: DataTypes.STRING,
+    payment_result_code: DataTypes.STRING,
+    payment_message: DataTypes.STRING,
+    paid_at: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Booking',

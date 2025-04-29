@@ -11,6 +11,7 @@ const { development } = require("../config/config");
 const { getRoleByName } = require("./role.service");
 const { CACHE_USER } = require("../config/constant");
 const { setHashValue, deleteHashField } = require("../models/repo/cache/cache.redis");
+const { sendMailPersonalProducer } = require("../queue/services/sendMailBooking");
 
 const Role = {
     USER:'User',
@@ -43,6 +44,7 @@ class AccessService {
        const payload = {
             sub: userId,
             email,
+            roleId: foundUser.usr_role_id
        } 
        const tokens = await createTokenPair(payload, publicKey, privateKey );
        const keyUser = `${CACHE_USER.user}${userId}`
@@ -60,7 +62,9 @@ class AccessService {
             'refreshToken', 
             tokens.refreshToken,
             'publicKey',
-            publicKey
+            publicKey,
+            'roleId',
+            foundUser.usr_role_id,
         )
        }
 
@@ -111,7 +115,8 @@ class AccessService {
         const payload = {
             sub: newUser.id,
             email,
-       } 
+            roleId: foundRole.id
+        } 
         const tokens = await createTokenPair(payload, publicKey, privateKey );
         console.log("tokens create successfully!", tokens);
         if(!tokens) {
@@ -126,7 +131,9 @@ class AccessService {
             'refreshToken', 
             tokens.refreshToken, 
             'publicKey',
-            newTokens.publicKey
+            newTokens.publicKey,
+            'roleId',
+            foundRole.id,
         )
 
         return {
@@ -143,9 +150,83 @@ class AccessService {
             await deleteHashField(`${CACHE_USER.user}${keyStore.id}`, 'accessToken');
             await deleteHashField(`${CACHE_USER.user}${keyStore.id}`, 'refreshToken');
             await deleteHashField(`${CACHE_USER.user}${keyStore.id}`, 'publicKey');
+            await deleteHashField(`${CACHE_USER.user}${keyStore.id}`, 'roleId');
         }
         return delKey;
-   }
+    }
+
+    static forgotPassword = async ({ email }) => {
+        const foundUser = await db.User.findOne({
+            where: { usr_email: email }
+        });
+
+        if (!foundUser || foundUser.user_oauth_provider == 'google' || foundUser.user_oauth_provider == 'facebook') {
+            throw new BadRequestError('Shop is not registered');
+        }
+
+        const resetToken = crypto.randomBytes(64).toString('hex');
+
+        const resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        const resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+        try {
+            const abd = await foundUser.update({
+                usr_reset_password_token: resetPasswordToken,
+                usr_reset_password_expires: resetPasswordExpires
+            });
+            console.log("abd", abd);
+            
+        } catch (error) {
+            console.error('Update failed:', error);
+        }
+
+        const resetPasswordLink = `${process.env.URL_CLIENT}/reset-password/${resetToken}`;
+
+        const message = {
+            email,
+            linkHtml: resetPasswordLink
+        };
+
+        const nameQueue = "reset_password_queue"
+        const exchange = "email_exchange"
+        const routingkey = "reset.password"
+        await sendMailPersonalProducer({
+            message: message,
+            nameQueue,
+            exchange,
+            routingkey
+        })
+
+        return 1;
+    }
+
+
+    static resetPassword = async ({ newPassword, paramsToken }) => {
+        const resetToken = crypto.createHash('sha256').update(paramsToken).digest('hex');
+    
+        const foundUser = await db.User.findOne({
+            where: {
+                usr_reset_password_token: resetToken,
+                usr_reset_password_expires: {
+                    [db.Sequelize.Op.gt]: Date.now()
+                }
+            }
+        });
+    
+        if (!foundUser) {
+            throw new BadRequestError("Token not exists or expired!");
+        }
+    
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+        const updatePass = await foundUser.update({
+            usr_password: passwordHash,
+            usr_reset_password_token: null,
+            usr_reset_password_expires: null
+        });
+    
+        return updatePass;
+    }    
 
 }
 

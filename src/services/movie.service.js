@@ -4,64 +4,69 @@ const { searchMovie, foundMovieByName, foundMovieById } = require('../models/rep
 const { getCategoryByName } = require('./category.service');
 const UploadService = require('./upload.service');
 const { DestroyCloudinary } = require('../utils');
+const { Op } = require('sequelize');
 
 class MovieFactory {
     static async createMovie(payload, filePathImg = null) {
+        
         const { 
             movie_title, movie_content, movie_time, movie_director, movie_performer, 
             movie_status, movie_country, movie_price, movie_video_trailer_code, movie_category_name,
             movie_release_date, movie_age_rating 
         } = payload;
         
-        const foundMovie = await foundMovieByName(movie_title);
-        if (foundMovie) throw new BadRequestError("Movie already exists");
+        const result = await db.sequelize.transaction(async (t) => {
+            const foundMovie = await foundMovieByName(movie_title);
+            if (foundMovie) throw new BadRequestError("Movie already exists");
+            
+            let hasImage = null;
+            if (filePathImg) {
+                hasImage = await UploadService.uploadImageFromLocal({ path: filePathImg });
+            }
         
-        let hasImage = null;
-        if (filePathImg) {
-            hasImage = await UploadService.uploadImageFromLocal({ path: filePathImg });
-        }
-    
-        const newMovie = await db.Movie.create({ 
-            movie_title, 
-            movie_image_url: hasImage?.image_url, 
-            movie_video_trailer_code, 
-            movie_content, 
-            movie_time, 
-            movie_director, 
-            movie_performer, 
-            movie_country, 
-            movie_status, 
-            movie_price,
-            movie_release_date,
-            movie_age_rating
-        });
-    
-        if (!newMovie) throw new BadRequestError("Create Movie error");
-        console.log("movie_category_name", movie_category_name);
-        let movieCategoryNameParsed = [];
-        try {
-            movieCategoryNameParsed = JSON.parse(movie_category_name);
-        } catch (error) {
-            throw new BadRequestError("Invalid category format");
-        }
+            const newMovie = await db.Movie.create({ 
+                movie_title, 
+                movie_image_url: hasImage?.image_url, 
+                movie_video_trailer_code, 
+                movie_content, 
+                movie_time, 
+                movie_director, 
+                movie_performer, 
+                movie_country, 
+                movie_status, 
+                movie_price,
+                movie_release_date,
+                movie_age_rating
+            }, { transaction: t });
         
-
-        if (movieCategoryNameParsed && Array.isArray(movieCategoryNameParsed) && movieCategoryNameParsed.length > 0) {
-            const categoryPromises = movieCategoryNameParsed.map(async (category) => {
-                let foundCate = await getCategoryByName(category.name);
-                if (!foundCate) throw new BadRequestError(`Category "${category.name}" not found`);
-
-                return db.movie_category.create({
-                    cate_id: foundCate.id,
-                    movie_id: newMovie.id
+            if (!newMovie) throw new BadRequestError("Create Movie error");
+            console.log("movie_category_name", movie_category_name);
+            let movieCategoryNameParsed = [];
+            try {
+                movieCategoryNameParsed = JSON.parse(movie_category_name);
+            } catch (error) {
+                throw new BadRequestError("Invalid category format");
+            }
+            
+    
+            if (movieCategoryNameParsed && Array.isArray(movieCategoryNameParsed) && movieCategoryNameParsed.length > 0) {
+                const categoryPromises = movieCategoryNameParsed.map(async (category) => {
+                    let foundCate = await getCategoryByName(category.name);
+                    if (!foundCate) throw new BadRequestError(`Category "${category.name}" not found`);
+    
+                    return db.movie_category.create({
+                        cate_id: foundCate.id,
+                        movie_id: newMovie.id
+                    }, { transaction: t });
                 });
-            });
-
-            await Promise.all(categoryPromises);
-        }
-
     
-        return newMovie;
+                await Promise.all(categoryPromises);
+            }
+    
+        
+            return newMovie;
+        });
+        return result;
     }
     
 
@@ -84,14 +89,27 @@ class MovieFactory {
         })
     }
 
-    static async getMovies({ limit = 30, sort = 'ctime', page = 1, movie_status = null, category = null }) {
+    static async getMovies({ limit = 30, sort = '', page = 1, movie_status = null, category = null, search = '' }) {
         const offset = (page - 1) * limit;
-        const order = sort === 'ctime' ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']];
+        let order = [];
+        if (sort === 'asc') {
+            order = [['createdAt', 'ASC']];
+        } else if (sort === 'desc') {
+            order = [['createdAt', 'DESC']];
+        } else {
+            order = [['createdAt', 'DESC']]; 
+        }
     
         let foundCategory = null;
     
         const whereCondition = {};
         if (movie_status) whereCondition.movie_status = movie_status;
+
+        if (search && search.trim() !== '') {
+            whereCondition.movie_title = {
+                [Op.iLike]: `%${search.trim()}%`
+            };
+        }
 
         if (category) {
             foundCategory = await db.category.findOne({
@@ -128,83 +146,89 @@ class MovieFactory {
     
 
     static async updateMovie(movieId, payload, filePathImg = null) {
-        const movie = await db.Movie.findOne({ where: { id: movieId } });
-        if (!movie) {
-            throw new BadRequestError("Movie not found");
-        }
-    
-        const {
-            movie_title, movie_content, movie_time, movie_director, movie_performer, 
-            movie_status, movie_country, movie_price, movie_video_trailer_code,
-            movie_release_date, movie_age_rating, movie_category_name, movie_image_url
-        } = payload;
-
-        let hasImage = null;
-        if (filePathImg) {
-            hasImage = await UploadService.uploadImageFromLocal({ path: filePathImg });
-        }
-    
-        await movie.update({
-            movie_title, 
-            movie_content, 
-            movie_time, 
-            movie_director, 
-            movie_performer, 
-            movie_status, 
-            movie_country, 
-            movie_price, 
-            movie_video_trailer_code, 
-            movie_release_date, 
-            movie_age_rating,
-            movie_image_url: hasImage ? hasImage.image_url : movie.movie_image_url
-        });
-    
-        if (movie_category_name) {
-            let movieCategoryNameParsed = [];
-            try {
-                movieCategoryNameParsed = JSON.parse(movie_category_name);
-            } catch (error) {
-                throw new BadRequestError("Invalid category format");
+        const result = await db.sequelize.transaction(async (t) => {
+            const movie = await db.Movie.findOne({ where: { id: movieId }, transaction: t });
+            if (!movie) {
+                throw new BadRequestError("Movie not found");
             }
-            if (!Array.isArray(movieCategoryNameParsed)) {
-                throw new BadRequestError("movie_category_name must be an array");
+        
+            const {
+                movie_title, movie_content, movie_time, movie_director, movie_performer, 
+                movie_status, movie_country, movie_price, movie_video_trailer_code,
+                movie_release_date, movie_age_rating, movie_category_name, movie_image_url
+            } = payload;
+    
+            let hasImage = null;
+            if (filePathImg) {
+                hasImage = await UploadService.uploadImageFromLocal({ path: filePathImg });
             }
-    
-            await db.movie_category.destroy({
-                where: { movie_id: movieId }
-            });
-    
-            const categoryPromises = movieCategoryNameParsed.map(async (category) => {
-                const foundCate = await getCategoryByName(category.name);
-                if (!foundCate) {
-                    throw new BadRequestError(`Category "${category.name}" not found`);
+        
+            await movie.update({
+                movie_title, 
+                movie_content, 
+                movie_time, 
+                movie_director, 
+                movie_performer, 
+                movie_status, 
+                movie_country, 
+                movie_price, 
+                movie_video_trailer_code, 
+                movie_release_date, 
+                movie_age_rating,
+                movie_image_url: hasImage ? hasImage.image_url : movie.movie_image_url
+            }, { transaction: t });
+        
+            if (movie_category_name) {
+                let movieCategoryNameParsed = [];
+                try {
+                    movieCategoryNameParsed = JSON.parse(movie_category_name);
+                } catch (error) {
+                    throw new BadRequestError("Invalid category format");
                 }
-    
-                return db.movie_category.create({
-                    cate_id: foundCate.id,
-                    movie_id: movieId
+                if (!Array.isArray(movieCategoryNameParsed)) {
+                    throw new BadRequestError("movie_category_name must be an array");
+                }
+        
+                await db.movie_category.destroy({
+                    where: { movie_id: movieId },
+                    transaction: t
                 });
-            });
-    
-            await Promise.all(categoryPromises);
-        }
-    
-        return await db.Movie.findOne({
-            where: { id: movieId },
-            include: [{
-                model: db.movie_category,
-                as: 'movie_categories',
-                attributes: ['cate_id'],
-                include: [
-                    {
-                        model: db.category,
-                        as: 'category',
-                        attributes: ['cate_name']
+        
+                const categoryPromises = movieCategoryNameParsed.map(async (category) => {
+                    const foundCate = await getCategoryByName(category.name);
+                    if (!foundCate) {
+                        throw new BadRequestError(`Category "${category.name}" not found`);
                     }
-                ]
-            }],
-            attributes: { exclude: ['createdAt', 'updatedAt'] }
+        
+                    return db.movie_category.create({
+                        cate_id: foundCate.id,
+                        movie_id: movieId
+                    }, { transaction: t });
+                });
+        
+                await Promise.all(categoryPromises);
+            }
+        
+            return await db.Movie.findOne({
+                where: { id: movieId },
+                include: [{ 
+                    model: db.movie_category,
+                    as: 'movie_categories',
+                    attributes: ['cate_id'],
+                    include: [
+                        {
+                            model: db.category,
+                            as: 'category',
+                            attributes: ['cate_name']
+                        }
+                    ]
+                }],
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                transaction: t
+            });
         });
+
+        return result;
     }
     
     

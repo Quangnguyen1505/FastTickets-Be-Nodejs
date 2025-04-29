@@ -11,6 +11,7 @@ router.use('/v1/api/categories', require('./Category'));
 router.use('/v1/api/rooms', require('./Room'));
 router.use('/v1/api/seats', require('./Seats'));
 router.use('/v1/api/seat-types', require('./SeatTypes'));
+router.use('/v1/api/payment', require('./Payment'));
 router.use('/v1/api/bookings', require('./Booking'));
 router.use('/v1/api/upload', require('./Upload'));
 

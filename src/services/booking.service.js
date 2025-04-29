@@ -27,6 +27,7 @@ class BookingService {
         const {
             user_order
         } = payload;
+        console.log("user_order", user_order);
         if(!user_order) throw new NotFoundError('Varible invalid!!');
         
         const foundShowtime = await findShowTimeById(show_time_id)
@@ -38,7 +39,7 @@ class BookingService {
             let foundSeat = await findSeatByCode(user_order[i].location, 'available');
             if (!foundSeat) throw new BadRequestError(`Seat ${user_order[i].location} not exists!!`);
     
-            let seat_types = await findSeatTypeByName(user_order[i].type);
+            let seat_types = await findSeatTypeByName({name: user_order[i].type});
             if (!seat_types) throw new BadRequestError("Seat type not exists!!");
     
             let price_ticket = await getTicketPrice(foundShowtime.id, seat_types.id);
@@ -59,7 +60,8 @@ class BookingService {
             movie: {
                 movie_id: foundShowtime.Movie.id,
                 movie_title: foundShowtime.Movie.movie_title,
-                age_rating: foundShowtime.Movie.movie_age_rating
+                age_rating: foundShowtime.Movie.movie_age_rating,
+                image_url: foundShowtime.Movie.movie_image_url
             },
             room: {
                 room_id: foundShowtime.Room.id,
@@ -78,21 +80,15 @@ class BookingService {
 
     }
 
-    static async createBooking({ userId, email, payload }) { 
-        const { show_time_id, user_order_book } = payload;
-        const { checkoutPrice, showtime, user_order } = await BookingService.checkoutReviewBooking({
-            show_time_id, payload: {
-                user_order: user_order_book
-            }
-        });
+    static async createBooking({ 
+        userId, 
+        email, 
+        dataCallback,
+        checkoutPrice,
+        showtime,
+        user_order
+    }) { 
         if(!checkoutPrice) throw new NotFoundError("checkout price not exists!!");
-
-
-        //check seat exists
-        for (let i = 0; i < user_order.length; i++) {
-            let foundSeat = await findSeatByCode(user_order[i].location, "booked");
-            if (foundSeat) throw new BadRequestError(`Seat ${user_order[i].location} already booked!!`);
-        }
     
         const newBooking = await db.Booking.create({
             booking_roomId: showtime.room.room_id,
@@ -100,8 +96,13 @@ class BookingService {
             booking_movieId: showtime.movie.movie_id,
             booking_date: showtime.show_date,
             booking_total_checkout: checkoutPrice,
-            booking_show_time_id: showtime.show_time_id
+            booking_show_time_id: showtime.show_time_id,
+            payment_method: dataCallback.partnerCode.toLowerCase(),
+            payment_order_id: dataCallback.orderId,
+            payment_result_code: dataCallback.resultCode,
+            payment_message: dataCallback.message,
         });
+        console.log("newBooking", newBooking);
         if(!newBooking) throw new BadRequestError("save new booking error")
         
         for (let i = 0; i < user_order.length; i++) {
@@ -142,12 +143,12 @@ class BookingService {
         console.log("message", message);
         const nameQueue = "email_queue"
         const exchange = "email_exchange"
-        const routingKey = "booking.success"
+        const routingkey = "booking.success"
         await sendMailPersonalProducer({
             message: message,
             nameQueue,
             exchange,
-            routingKey
+            routingkey
         })
 
         return newBooking

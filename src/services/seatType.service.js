@@ -9,7 +9,7 @@ class SeatTypeService {
             name, description
         } = payload;
         
-        const hasSeatType = await findSeatTypeByName(name);
+        const hasSeatType = await findSeatTypeByName({name});
         if (hasSeatType) throw new BadRequestError('seat type exitst');
 
         const newSeatType = await db.Seat_type.create({

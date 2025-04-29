@@ -26,7 +26,7 @@ class ShowTimeService {
         const hasMovie = await foundMovieById(movie_id);
         if (!hasMovie) throw new BadRequestError('Movie not found');
 
-        const hasRoom = await foundRoomById(room_id);
+        const hasRoom = await foundRoomById({roomId: room_id});
         if (!hasRoom) throw new BadRequestError('Room not found');
 
         const convert_start_time = db.Sequelize.literal(`TIME '${start_time}'`);

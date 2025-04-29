@@ -3,23 +3,25 @@ const db = require('../models');
 class KeyTokenServices {
     static createKeyToken = async ({ userId, publicKey, privateKey, refreshToken }) => {
         try {
-            let createToken;
-            const fitler = { user_id: userId }, update = {
-                 publicKey, privateKey, refreshTokensUsed: [], refreshToken
-            };
-            createToken = await db.keyToken.findOrCreate({
-                where: fitler,
-                defaults: { user_id: userId, publicKey, privateKey, refreshToken }
+            const filter = { user_id: userId };
+            const update = { publicKey, privateKey, refreshTokensUsed: [], refreshToken };
+    
+            let [tokenRecord, created] = await db.keyToken.findOrCreate({
+                where: filter,
+                defaults: { ...update, user_id: userId }
             });
-
-            if(!createToken[1]){
-                createToken = await db.keyToken.update(update, { where: fitler });
+    
+            if (!created) {
+                await db.keyToken.update(update, { where: filter });
+                tokenRecord = await db.keyToken.findOne({ where: filter }); // lấy lại bản ghi sau khi update
             }
-            return tokens ? tokens.publicKey : null
+    
+            return tokenRecord; // ✅ trả object keyToken
         } catch (error) {
-            return error
+            throw error;
         }
     }
+    
 
     static findByUserId = async ( userId ) => {
         return await db.keyToken.findOne({

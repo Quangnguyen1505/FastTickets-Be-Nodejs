@@ -29,8 +29,12 @@ module.exports = (sequelize, DataTypes) => {
     usr_avatar_url: DataTypes.STRING,
     usr_date_of_birth: DataTypes.DATE,
     usr_address: DataTypes.STRING,
+    user_oauth_provider: DataTypes.ENUM('google', 'facebook'),
+    user_oauth_provider_id: DataTypes.STRING,
     usr_role_id: DataTypes.INTEGER,
-    usr_status: DataTypes.ENUM("active", "block")
+    usr_status: DataTypes.ENUM("active", "block"),
+    usr_reset_password_token: DataTypes.TEXT,
+    usr_reset_password_expires: DataTypes.BIGINT,
   }, {
     sequelize,
     modelName: 'User',

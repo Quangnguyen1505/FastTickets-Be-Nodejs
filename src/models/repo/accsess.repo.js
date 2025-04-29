@@ -1,7 +1,7 @@
 const db = require('../../models');
 
 const findByEmail = async ({ email, select = [
-    "id", "usr_email", "usr_password", "usr_first_name", "usr_last_name"
+    "id", "usr_email", "usr_password", "usr_first_name", "usr_last_name", "usr_role_id"
 ]}) => {
     return await db.User.findOne({
         where: {usr_email: email},

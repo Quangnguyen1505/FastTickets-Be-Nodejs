@@ -5,18 +5,18 @@ const { foundRoomById } = require("../models/repo/room.repo");
 const { findSeatById, findAllSeat } = require("../models/repo/seat.repo");
 
 class SeatService {
-    static async createSeat(payload){
+    static async createSeat(payload, t){
         if(!payload) throw new BadRequestError('Payload not exitst!!');
         const {
             seat_row, seat_type_id, seat_number, seat_roomId
         } = payload;
         
-        const hasRoom = await foundRoomById(seat_roomId);
+        const hasRoom = await foundRoomById({roomId: seat_roomId, t});
         if (!hasRoom) throw new BadRequestError('Room not found');
 
         const newSeat = await db.Seat.create({
             seat_row, seat_type_id, seat_number, seat_roomId
-        });
+        }, {transaction: t});
         if(!newSeat) throw new BadRequestError("create failed!!");
 
         return newSeat;

@@ -2,7 +2,6 @@ const JWT = require('jsonwebtoken');
 const { handlerError:asyncHandler } = require('../helper/asyncHandler')
 const { findByUserId } = require('../services/keyToken.service');
 const { AuthFailureError, NotFoundError } = require('../core/error.response');
-const logger = require('../loggers/winston.log');
 const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
@@ -16,10 +15,14 @@ const createTokenPair = async ( payload, publicKey, privateKey )=>{
             expiresIn: '2 days'
         });
 
+        console.log("accessToken", accessToken);
+
         const refreshToken = JWT.sign( payload, privateKey, {
             // algorithm: 'RS256',
             expiresIn: '7 days'
         });
+
+        console.log("refreshToken", refreshToken);
 
         JWT.verify( accessToken, publicKey, ( err, decode )=>{
             if(err){
@@ -52,7 +55,6 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
     if( !userId ) return;
     
     const keyStore = await findByUserId(userId);
-    // console.log("keyStore::", keyStore);
     if(!keyStore) throw new NotFoundError('Not Found keyStore');
     const refreshToken = req.headers[HEADER.REFRESHTOKEN];
     // const refreshToken = req.cookies[HEADER.REFRESHTOKEN];
@@ -88,6 +90,7 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
         req.userId = decodeUser.sub;
         req.user = decodeUser;
         req.email = decodeUser.email;
+        req.roleId = decodeUser.roleId;
         return next();
         
     } catch (error) {

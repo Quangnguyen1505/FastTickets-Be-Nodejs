@@ -54,6 +54,28 @@ class AccessController{
             metadata: await AccessService.logout(req.keyStore)
         }).send(res);
     }
+
+    verifyToken = async (req,res,next) => {
+        new SuccessResponse({
+            message: "verify token success",
+            metadata: true
+        }).send(res);
+    }
+
+    forgotPassword =  async (req,res,next)=>{
+        console.log("req.body", req.body);
+        new SuccessResponse ({
+            message: "send email OK !!",
+            metadata:  await AccessService.forgotPassword(req.body)
+        }).send(res)
+    }
+
+    resetPassword = async (req,res,next)=>{
+        new SuccessResponse ({
+            message: "reset password OK !!",
+            metadata: await AccessService.resetPassword(req.body)
+        }).send(res)
+    }
 }
 
 

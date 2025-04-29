@@ -1,6 +1,6 @@
 const db = require('..');
 
-const foundRoomById = async ( roomId ) => {
+const foundRoomById = async ({roomId, t = null}) => {
     const foundRoom = await db.Room.findOne({
         where: {id: roomId},
         include: [{
@@ -20,6 +20,7 @@ const foundRoomById = async ( roomId ) => {
             as: 'Seats',
             attributes: ['seat_row', 'seat_number', 'seat_status'] 
         }],
+        transaction: t
     });
 
     return foundRoom;

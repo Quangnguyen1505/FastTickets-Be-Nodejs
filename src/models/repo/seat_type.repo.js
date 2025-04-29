@@ -1,8 +1,9 @@
 const db = require('../../models');
 
-const findSeatTypeByName = (name) => {
+const findSeatTypeByName = ({name, t = null}) => {
     return db.Seat_type.findOne({
-        where: { name: name }
+        where: { name: name },
+        transaction: t
     })
 }
 

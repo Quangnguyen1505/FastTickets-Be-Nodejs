@@ -1,5 +1,6 @@
 module.exports = {
     CACHE_USER: {
-        'user': 'user-'
+        'user': 'user-',
+        'role': 'role-admin',
     }
 }

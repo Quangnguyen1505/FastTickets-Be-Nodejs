@@ -44,9 +44,24 @@ module.exports = {
       usr_address: {
         type: Sequelize.STRING
       },
+      user_oauth_provider: {
+        type: Sequelize.ENUM('google', 'facebook'),
+        allowNull: true,
+      },
+      user_oauth_provider_id: {
+        type: Sequelize.STRING
+      },
       usr_status: {
         type: Sequelize.ENUM("active", "block"),
         defaultValue: 'active'
+      },
+      usr_reset_password_token: {
+        type: Sequelize.TEXT, 
+        allowNull: true
+      },
+      usr_reset_password_expires: {
+        type: Sequelize.BIGINT, 
+        allowNull: true
       },
       usr_role_id: {
         type: Sequelize.INTEGER,
