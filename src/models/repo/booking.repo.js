@@ -34,7 +34,7 @@ const foundBookingById = async ( bookingId ) => {
                     {
                         model: db.Seat,
                         as: 'Seat',
-                        attributes: ['seat_row', 'seat_number', 'seat_status'] 
+                        attributes: ['seat_row', 'seat_number'] 
                     }
                 ]
             }
@@ -61,12 +61,12 @@ const foundAllBooking = async ({ limit, sort, page, unselect }) => {
             {
                 model: db.Movie,
                 as: 'Movie', 
-                attributes: ['id', 'movie_title']
+                attributes: ['id', 'movie_title', 'movie_image_url']
             },
             {
                 model: db.User,
                 as: 'User', 
-                attributes: ['id', 'usr_first_name', 'usr_last_name']
+                attributes: ['id', 'usr_first_name', 'usr_last_name', 'usr_email']
             },
             {
                 model: db.Showtime,
@@ -81,7 +81,7 @@ const foundAllBooking = async ({ limit, sort, page, unselect }) => {
                     {
                         model: db.Seat,
                         as: 'Seat',
-                        attributes: ['seat_row', 'seat_number', 'seat_status'] 
+                        attributes: ['seat_row', 'seat_number'] 
                     }
                 ]
             }
@@ -91,7 +91,53 @@ const foundAllBooking = async ({ limit, sort, page, unselect }) => {
     return foundBookings;
 } 
 
+const foundBookingByUserId = async ( userId, { limit, sort, page, unselect }) => {
+    const skip = ( page - 1 ) * limit;
+    const sortBy = sort == 'ctime' ? {_id: -1} : {_id: 1};
+    
+    const foundBooking = await db.Booking.findAll({
+        where: {
+            booking_userId: userId
+        },
+        limit,
+        skip,
+        sort: sortBy,
+        include: [
+            {
+                model: db.Room,
+                as: 'Room', 
+                attributes: ['id', 'room_name']
+            },
+            {
+                model: db.Movie,
+                as: 'Movie', 
+                attributes: ['id', 'movie_title', 'movie_image_url']
+            },
+            {
+                model: db.Showtime,
+                as: 'Showtime', 
+                attributes: ['id', 'show_date', 'start_time']
+            },
+            {
+                model: db.booking_seat,
+                as: 'booking_seats', 
+                attributes: ['seat_id'],
+                include: [
+                    {
+                        model: db.Seat,
+                        as: 'Seat',
+                        attributes: ['seat_row', 'seat_number'] 
+                    }
+                ]
+            }
+        ],
+    })
+
+    return foundBooking;
+}
+
 module.exports = {
     foundBookingById,
-    foundAllBooking
+    foundAllBooking,
+    foundBookingByUserId
 }

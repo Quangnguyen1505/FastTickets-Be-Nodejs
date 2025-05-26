@@ -17,5 +17,6 @@ router.put("/:id", uploadDisk.single('file'), handlerError(UsersController.updat
 router.get("", handlerError(UsersController.getUsers));
 router.delete("/:id", handlerError(UsersController.deleteUser));
 router.post("", handlerError(UsersController.addUser));
+router.get("/count", handlerError(UsersController.getCountUser));
 
 module.exports = router;    

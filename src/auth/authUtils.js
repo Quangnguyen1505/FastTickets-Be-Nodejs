@@ -49,10 +49,10 @@ const authencationV2 = asyncHandler ( async ( req, res, next)=>{
       6. OK all => return next()
     */
     const userId = req.headers[HEADER.CLIENT_ID];
-    
+    console.log("userId header", userId)
     // const userId = req.cookies[HEADER.CLIENT_ID];
     // if( !userId ) throw new AuthFailureError('Invalid Request');
-    if( !userId ) return;
+    if (!userId) throw new AuthFailureError('Missing userId in header');
     
     const keyStore = await findByUserId(userId);
     if(!keyStore) throw new NotFoundError('Not Found keyStore');

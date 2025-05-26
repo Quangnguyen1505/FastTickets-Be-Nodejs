@@ -7,9 +7,10 @@ const findSeatTypeByName = ({name, t = null}) => {
     })
 }
 
-const findSeatTypeById = (seatTypeId) => {
+const findSeatTypeById = ({seatTypeId, t = null}) => {
     return db.Seat_type.findOne({
-        where: { id: seatTypeId }
+        where: { id: seatTypeId },
+        transaction: t
     })
 }
 

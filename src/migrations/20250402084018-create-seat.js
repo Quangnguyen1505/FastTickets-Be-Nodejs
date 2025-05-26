@@ -16,10 +16,6 @@ module.exports = {
       seat_number: {
         type: Sequelize.INTEGER
       },
-      seat_status: {
-        type: Sequelize.ENUM('available', 'booked', 'reserved', 'unavailable'),
-        defaultValue: 'available'
-      },
       seat_roomId: {
         type: Sequelize.UUID,
         references: {

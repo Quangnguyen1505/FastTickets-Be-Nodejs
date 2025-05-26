@@ -11,10 +11,10 @@ const { development } = require("../config/config");
 const { getRoleByName } = require("./role.service");
 const { CACHE_USER } = require("../config/constant");
 const { setHashValue, deleteHashField } = require("../models/repo/cache/cache.redis");
-const { sendMailPersonalProducer } = require("../queue/services/sendMailBooking");
+const { producerSendToExchange } = require("../queue/services/sendMailBooking");
 
 const Role = {
-    USER:'User',
+    USER: 'User',
 }
 
 class AccessService {
@@ -190,7 +190,7 @@ class AccessService {
         const nameQueue = "reset_password_queue"
         const exchange = "email_exchange"
         const routingkey = "reset.password"
-        await sendMailPersonalProducer({
+        await producerSendToExchange({
             message: message,
             nameQueue,
             exchange,

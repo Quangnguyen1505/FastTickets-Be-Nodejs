@@ -6,7 +6,7 @@ const foundRoomById = async ({roomId, t = null}) => {
         include: [{
             model: db.Room_seat_type,
             as: 'Room_seat_types', 
-            attributes: ['seat_type_id'],
+            attributes: ['seat_type_id', 'quantity'],
             include: [
                 {
                     model: db.Seat_type,
@@ -18,7 +18,7 @@ const foundRoomById = async ({roomId, t = null}) => {
             
             model: db.Seat,
             as: 'Seats',
-            attributes: ['seat_row', 'seat_number', 'seat_status'] 
+            attributes: ['seat_row', 'seat_number'] 
         }],
         transaction: t
     });
@@ -37,7 +37,7 @@ const foundAllRoom = async ({ limit, sort, page, unselect }) => {
         include: [{
             model: db.Room_seat_type,
             as: 'Room_seat_types', 
-            attributes: ['seat_type_id'],
+            attributes: ['seat_type_id', 'quantity'],
             include: [
                 {
                     model: db.Seat_type,

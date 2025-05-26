@@ -23,7 +23,7 @@ class SeatTypeService {
     static async findSeatTypeById(seatTypeId){
         if(!seatTypeId) throw new BadRequestError("Seat type not exitst!!");
 
-        const foundSeatType = await findSeatTypeById(seatTypeId);
+        const foundSeatType = await findSeatTypeById({seatTypeId});
         if(!foundSeatType) throw new BadRequestError('Seat not exists!!');
 
         return foundSeatType;

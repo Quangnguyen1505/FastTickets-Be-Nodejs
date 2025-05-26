@@ -1,7 +1,7 @@
 const { where, Op } = require('sequelize');
 const db = require('../../models');
 
-const findConflicTime = async ({room_id, show_date, start_time, end_time}) => {
+const findConflicTime = async ({room_id, show_date, start_time, end_time, t = null}) => {
     const overlappingShowTime = await db.Showtime.findOne({
         where: {
             room_id: room_id,
@@ -11,12 +11,13 @@ const findConflicTime = async ({room_id, show_date, start_time, end_time}) => {
                 { end_time: { [Op.between]: [start_time, end_time] } },
                 { start_time: { [Op.lte]: start_time }, end_time: { [Op.gte]: end_time } } 
             ]
-        }
+        },
+        transaction: t
     });
     return overlappingShowTime
 }
 
-const findShowTimeById = async (showtime_id) => {
+const findShowTimeById = async ({showtime_id, t = null}) => {
     const showtime = await db.Showtime.findOne({
         where: { id: showtime_id },
         include: [
@@ -31,15 +32,17 @@ const findShowTimeById = async (showtime_id) => {
                 attributes: ['id', 'room_name']
             }
         ],
+        transaction: t
     })
 
     return showtime
 }
 
-const findShowTimeByMovieId = async(movie_id) => {
+const findShowTimeByMovieId = async(movie_id, { show_date = null }) => {
     const showTimes = db.Showtime.findAll({
         where: {
-            movie_id
+            movie_id,
+            ...(show_date && { show_date })
         },
         include: [
             {
@@ -54,7 +57,6 @@ const findShowTimeByMovieId = async(movie_id) => {
             }
         ],
     })
-
     return showTimes
 }
 

@@ -28,6 +28,7 @@ app.use(cookieParser());
 
 //init swagger ui
 const { openApiDoc } = require('./config/swaggerDoc.config');
+const { producerSendToExchange } = require('./queue/services/sendMailBooking');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
 //init db

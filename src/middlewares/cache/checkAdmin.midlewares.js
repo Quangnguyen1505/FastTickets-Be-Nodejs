@@ -23,8 +23,8 @@ const checkAdmin = asyncHandler ( async ( req, res, next)=>{
             if (!roleData) throw new NotFoundError('Not Found Role');
             await setValueCache(keyRoleAdmin, JSON.stringify(roleData)); 
         }
-
-        if (roleData.role_name !== "admin") throw new ForBiddenError('Forbidden');
+        console.log("roleData 2", roleData);
+        if (roleData.role_name !== "Admin") throw new ForBiddenError('Forbidden');
 
         return next();
         

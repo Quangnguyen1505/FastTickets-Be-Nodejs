@@ -54,20 +54,12 @@ class UsersController{
         }).send(res);
     }
 
-//     forgotPassword =  async (req,res,next)=>{
-//         console.log("req.body", req.body);
-//         new SuccessResponse ({
-//             message: "send email OK !!",
-//             metadata:  await UsersService.forgotPassword(req.body)
-//         }).send(res)
-//     }
-
-//     resetPassword = async (req,res,next)=>{
-//         new SuccessResponse ({
-//             message: "reset password OK !!",
-//             metadata:  await UsersService.resetPassword(req.body)
-//         }).send(res)
-//     }
+    getCountUser = async (req,res,next) => {
+        new SuccessResponse({
+            message: "get count user success",
+            metadata: await UsersService.getCountUser()
+        }).send(res);
+    }
 }
 
 

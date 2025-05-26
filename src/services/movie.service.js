@@ -5,6 +5,8 @@ const { getCategoryByName } = require('./category.service');
 const UploadService = require('./upload.service');
 const { DestroyCloudinary } = require('../utils');
 const { Op } = require('sequelize');
+const { notificationClient } = require('../grpc/client/init.client');
+const { producerSendToExchange } = require('../queue/services/sendMailBooking');
 
 class MovieFactory {
     static async createMovie(payload, filePathImg = null) {
@@ -62,8 +64,30 @@ class MovieFactory {
     
                 await Promise.all(categoryPromises);
             }
-    
-        
+
+            const messageNoti = {
+                pattern: 'noti_created',
+                data: {
+                    noti_type: "MOVIE",
+                    noti_content: "Rạp vừa ra mắt phim mới, xem ngay !",
+                    noti_options: {
+                        id: newMovie.id,
+                        title: newMovie.movie_title,
+                    },
+                    noti_senderId: null,
+                    noti_receivedId: null
+                }
+            }
+            const nameQueueNoti = 'noti_queue'
+            const exchangeNoti = 'noti_exchange'
+            const routingkeyNoti = 'noti_created'
+            await producerSendToExchange({
+                message: messageNoti,
+                nameQueue: nameQueueNoti,
+                exchange: exchangeNoti,
+                routingkey: routingkeyNoti
+            })
+
             return newMovie;
         });
         return result;
@@ -239,7 +263,7 @@ class MovieFactory {
     }
 
     static async deleteMovieById( movieId ) {
-        const foundMovie = await foundMovieById(movieId);
+        const foundMovie = await foundMovieById({movieId});
 
         if(!foundMovie) throw new BadRequestError("Movie not found");
 

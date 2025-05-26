@@ -30,9 +30,14 @@ const updateUserByUserId = async ({ userId, payload }) => {
     )
 }
 
+const getCountUser = async () => {
+    return await db.User.count();
+}
+
 
 module.exports = {
     findByEmail,
     findByUserId,
-    updateUserByUserId
+    updateUserByUserId,
+    getCountUser
 }

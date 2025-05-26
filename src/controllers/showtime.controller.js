@@ -33,7 +33,7 @@ class ShowTimeController {
     async getAllShowTimeByMovieId(req, res, next) {
         new SuccessResponse({
             message: 'get all showtime by MovieID success',
-            metadata: await ShowTimeService.getAllShowTimeByMovieId(req.params.movie_id)
+            metadata: await ShowTimeService.getAllShowTimeByMovieId(req.params.movie_id, req.query)
         }).send(res);
     }
 

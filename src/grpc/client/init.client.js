@@ -1,0 +1,23 @@
+const grpc = require('@grpc/grpc-js');
+const loadProto = require('../loader');
+
+function getNestedService(obj, path) {
+  return path.split('.').reduce((o, k) => (o && o[k] ? o[k] : undefined), obj);
+}
+
+function createGrpcClient(protoFile, servicePath, host = 'localhost:50051') {
+  const proto = loadProto(protoFile);
+  const Service = getNestedService(proto, servicePath);
+
+  if (!Service) {
+    throw new Error(`Service "${servicePath}" not found in ${protoFile}`);
+  }
+
+  return new Service(host, grpc.credentials.createInsecure());
+}
+
+const snackClient = createGrpcClient('snacks.proto', 'snack.SnackService');
+const notificationClient = createGrpcClient('noti.proto', 'notification.NotificationService');
+const discountClient = createGrpcClient('discounts.proto', 'discount.DiscountService');
+
+module.exports = { snackClient, notificationClient, discountClient };

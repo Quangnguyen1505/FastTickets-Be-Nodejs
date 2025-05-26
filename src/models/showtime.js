@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       Showtime.belongsTo(models.Movie, { foreignKey: 'movie_id' });
       Showtime.hasMany(models.Booking, { foreignKey: 'booking_show_time_id' });
       Showtime.belongsTo(models.Room, { foreignKey: 'room_id' });
+      Showtime.hasMany(models.seat_status, { foreignKey: 'showtime_id' });
     }
   }
   Showtime.init({

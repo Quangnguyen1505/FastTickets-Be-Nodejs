@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package notification;
+
+// Notification service
+service NotificationService {
+  rpc GetNotifications (GetNotificationsRequest) returns (GetNotificationsResponse);
+  rpc DeleteNotification (DeleteNotificationRequest) returns (DeleteNotificationResponse);
+  rpc GetAllNotifications (GetAllNotificationsRequest) returns (GetAllNotificationsResponse);
+}
+
+// Enum loại thông báo
+enum NotificationType {
+  NEWS = 0;
+  MOVIE = 1;
+  EVENT = 2;
+  BOOKING = 3;
+}
+
+// Message chứa thông tin chi tiết sản phẩm (noti_options)
+message Info {
+  string id = 1;
+  string title = 2;
+}
+
+// Cấu trúc một thông báo
+message Notification {
+  string id = 1;
+  NotificationType noti_type = 2;
+  string noti_senderId = 3;
+  string noti_receivedId = 4; // Có thể để trống nếu là thông báo toàn hệ thống
+  string noti_content = 5;
+  Info noti_options = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+// Lấy danh sách thông báo cho user
+message GetNotificationsRequest {
+  string userId = 1;
+}
+
+message GetNotificationsResponse {
+  repeated Notification notifications = 1;
+}
+
+// Xoá thông báo
+message DeleteNotificationRequest {
+  string id = 1;
+}
+
+message DeleteNotificationResponse {
+  bool success = 1;
+}
+
+message GetAllNotificationsRequest {}
+
+message GetAllNotificationsResponse {
+  repeated Notification notifications = 1;
+}

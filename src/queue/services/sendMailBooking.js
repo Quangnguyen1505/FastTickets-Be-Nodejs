@@ -1,6 +1,6 @@
 const { connectToRabbitMQ, producerQueue } = require("../init.queue")
 
-const sendMailPersonalProducer = async ({nameQueue, message, exchange, routingkey}) => {
+const producerSendToExchange = async ({nameQueue, message, exchange, routingkey}) => {
     const { conn, channel } = await connectToRabbitMQ();
     await producerQueue({
         channel,
@@ -12,5 +12,5 @@ const sendMailPersonalProducer = async ({nameQueue, message, exchange, routingke
 }
 
 module.exports = {
-    sendMailPersonalProducer
+    producerSendToExchange
 }

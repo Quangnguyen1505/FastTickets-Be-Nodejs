@@ -1,8 +1,7 @@
-const { where } = require("sequelize");
 const { BadRequestError } = require("../core/error.response");
 const db = require('../models');
 const { foundRoomById } = require("../models/repo/room.repo");
-const { findSeatById, findAllSeat } = require("../models/repo/seat.repo");
+const { findSeatById } = require("../models/repo/seat.repo");
 
 class SeatService {
     static async createSeat(payload, t){
@@ -31,7 +30,7 @@ class SeatService {
         return foundSeat;
     }
 
-    static async findAllSeat({ limit = 100, sort = 'seat_row', page = 1, room_id = null }) {
+    static async findAllSeat({ limit = 100, sort = 'seat_row', page = 1, room_id = null, showtime_id = null }) {
         const validSortColumns = ['seat_row', 'seat_number', 'seat_type']; 
         const orderBy = validSortColumns.includes(sort) ? [sort, 'ASC'] : ['seat_row', 'ASC'];
     
@@ -44,11 +43,22 @@ class SeatService {
             limit: limit,
             offset: offset,
             order: [orderBy],
-            include: [{
-                model: db.Seat_type,
-                as: 'Seat_type', 
-                attributes: ['name']
-            }],
+            include: [
+                {
+                    model: db.Seat_type,
+                    as: 'Seat_type', 
+                    attributes: ['name']
+                },
+                {
+                    model: db.seat_status,
+                    as: 'seat_statuses',
+                    required: false,
+                    where: {
+                        showtime_id: showtime_id
+                    },
+                    attributes: ['status']
+                }
+        ],
             attributes: { exclude: ['createdAt', 'updatedAt'] }, 
         });
 
@@ -57,18 +67,22 @@ class SeatService {
         return foundAll;
     }
     
-    static async updateStatusSeat(seatId, seat_status) {
-        const foundSeat = await findSeatById(seatId);
+    static async updateStatusSeat({seatId, seat_status, showtime_id, t = null}) {
+        console.log("pay load", seatId, " ", seat_status)
+        const foundSeat = await findSeatById({seatId, t});
         if (!foundSeat) throw new BadRequestError('Seat not exists!!');
 
-        const updatedSeat = await db.Seat.update(
-            { seat_status },
-            { where: { id: seatId } }
-        );
+        const [affectedRows] = await db.seat_status.update(
+            { status: seat_status },
+            { 
+                where: { seat_id: seatId, showtime_id: showtime_id },
+                transaction: t
+            }
+        );  
+        
+        if (affectedRows === 0) throw new BadRequestError('Update failed!!');
 
-        if (!updatedSeat) throw new BadRequestError('Update failed!!');
-
-        return updatedSeat;
+        return affectedRows;
     }
     
 }

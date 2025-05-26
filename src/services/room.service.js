@@ -1,7 +1,6 @@
 const { BadRequestError, NotFoundError } = require('../core/error.response');
 const db = require('../models');
 const { foundRoomById, foundAllRoom, updateMovieToRoom } = require('../models/repo/room.repo');
-const { foundMovieById } = require('../models/repo/movie.repo');
 const { createSeat } = require('./seat.service');
 const { findSeatTypeByName } = require('../models/repo/seat_type.repo');
 
@@ -38,7 +37,8 @@ class RoomService{
             const newRoom = await db.Room.create({
                 room_name,
                 room_seat_quantity,
-                room_release_date
+                room_release_date,
+                room_status: true,
             }, { transaction: t });
         
             if (!newRoom) throw new BadRequestError('New Room failed!!');
@@ -261,7 +261,7 @@ class RoomService{
     static async getAllRoom ({ limit = 30, sort = 'ctime', page = 1  }){
         const foundRoom = await foundAllRoom({ limit, sort, page,
             unselect: ['createdAt', 'updatedAt'] });
-        if(!foundRoom.length) throw new BadRequestError('Room length not exists!!');
+        if(!foundRoom) throw new BadRequestError('Room length not exists!!');
 
         return foundRoom;
     }

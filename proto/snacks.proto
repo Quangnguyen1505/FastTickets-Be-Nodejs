@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package snack;
+
+option go_package = "./;proto";
+
+import "google/protobuf/timestamp.proto";
+
+service SnackService {
+  rpc GetAllSnacks (Empty) returns (SnackList);
+  rpc GetDetailSnack (SnackId) returns (SnackResponse);
+  rpc CreateSnack (CreateSnackRequest) returns (SnackResponse);
+  rpc UpdateSnack (UpdateSnackRequest) returns (SnackResponse);
+  rpc RemoveSnack (SnackId) returns (DeleteSnackResponse);
+}
+
+// Enum định nghĩa loại snack
+enum SnackCategory {
+  SNACK = 0;
+  DRINK = 1;
+}
+
+// Message đại diện cho một Snack
+message Snack {
+  string id = 1;
+  string item_name = 2;
+  int32 item_price = 3;
+  string item_image_url = 4;
+  int32 quantity_available = 5;
+  SnackCategory category = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// Request & Response Messages
+message Empty {}
+
+message SnackId {
+  string id = 1;
+}
+
+message SnackList {
+  repeated Snack snacks = 1;
+}
+
+message CreateSnackRequest {
+  string item_name = 1;
+  int32 item_price = 2;
+  string item_image_url = 3;
+  int32 quantity_available = 4;
+  SnackCategory category = 5;
+}
+
+message UpdateSnackRequest {
+  string id = 1;
+  string item_name = 2;
+  int32 item_price = 3;
+  string item_image_url = 4;
+  int32 quantity_available = 5;
+  SnackCategory category = 6;
+}
+
+message SnackResponse {
+  Snack snack = 1;
+}
+
+message DeleteSnackResponse {
+  bool success = 1;
+}

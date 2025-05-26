@@ -1,6 +1,6 @@
 const { BadRequestError, AuthFailureError } = require("../core/error.response");
 const bcrypt = require('bcrypt');
-const { findByEmail, findByUserId, updateUserByUserId } = require("../models/repo/accsess.repo");
+const { findByEmail, findByUserId, updateUserByUserId, getCountUser } = require("../models/repo/accsess.repo");
 const UploadService = require("./upload.service");
 const { getAllUsers, deleteUserByUserId } = require("../models/repo/users.repo");
 const { DestroyCloudinary } = require("../utils");
@@ -123,6 +123,11 @@ class UsersService {
           }
           return result;
      } 
+
+     static getCountUser = async () => {
+          const countUser = await getCountUser();
+          return countUser;
+     }
 }
 
 module.exports = UsersService
