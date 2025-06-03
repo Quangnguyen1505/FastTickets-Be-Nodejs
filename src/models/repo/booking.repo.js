@@ -93,7 +93,7 @@ const foundAllBooking = async ({ limit, sort, page, unselect }) => {
 
 const foundBookingByUserId = async ( userId, { limit, sort, page, unselect }) => {
     const skip = ( page - 1 ) * limit;
-    const sortBy = sort == 'ctime' ? {_id: -1} : {_id: 1};
+    const order = sort === 'ctime' ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']];
     
     const foundBooking = await db.Booking.findAll({
         where: {
@@ -101,7 +101,7 @@ const foundBookingByUserId = async ( userId, { limit, sort, page, unselect }) =>
         },
         limit,
         skip,
-        sort: sortBy,
+        order,
         include: [
             {
                 model: db.Room,

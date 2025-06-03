@@ -8,31 +8,31 @@ class RevenueService{
         const dateCondition = {};
         if (from && to) {
             dateCondition.createdAt = {
-                [Op.between]: [from, to]
+                [Op.between]: [from, to],
             };
         }
 
         const transactions = await db.Booking.findAll({
-            where: dateCondition
+            where: dateCondition,
         });
 
         const totalRevenue = transactions.reduce((sum, trans) => {
             return sum + (trans.booking_total_checkout || 0);
         }, 0);
 
-        if (groupBy === 'date') {
-            const revenueByDate = {};
-            transactions.forEach(trans => {
-                const date = trans.createdAt.toISOString().split('T')[0];
-                if (!revenueByDate[date]) {
-                    revenueByDate[date] = 0;
-                }
-                revenueByDate[date] += trans.booking_total_checkout || 0;
-            });
-            return revenueByDate;
-        }
+        const totalRevenueByDate = {};
+        transactions.forEach(trans => {
+            const date = trans.createdAt.toISOString().split('T')[0];
+            if (!totalRevenueByDate[date]) {
+                totalRevenueByDate[date] = 0;
+            }
+            totalRevenueByDate[date] += trans.booking_total_checkout || 0;
+        });
 
-        return { totalRevenue };
+        return {
+            totalRevenue,
+            totalRevenueByDate: groupBy === 'date' ? totalRevenueByDate : undefined,
+        };
     }
 
     static async getAllRevenueByEntity(query) {

@@ -36,7 +36,7 @@ class BookingService {
     //         "price": 100000
     //     }
     // ]
-    static async checkoutReviewBooking({ show_time_id, payload }) {
+    static async checkoutReviewBooking({ show_time_id, payload, methodChatbot = false }) {
         const {
             user_order,
             snacks_order,
@@ -49,9 +49,11 @@ class BookingService {
         if(!foundShowtime) throw new BadRequestError("show time not exists")
 
         let total_Price = [];
+        let seatStatus = methodChatbot ? 'available' : 'reserved';
 
         for (let i = 0; i < user_order.length; i++) {
-            let foundSeat = await findSeatByCode(user_order[i].location, 'reserved', show_time_id);
+            let foundSeat = await findSeatByCode(user_order[i].location, seatStatus, show_time_id);
+            
             if (!foundSeat) throw new BadRequestError(`Seat ${user_order[i].location} not exists!!`);
     
             let seat_types = await findSeatTypeByName({name: user_order[i].type});
@@ -66,21 +68,23 @@ class BookingService {
         }
 
         let snacks_order_detail = [];
-
-        for (let i = 0; i < snacks_order.length; i++) {
-            const snackDetail = await getSnackDetail(snacks_order[i].snack_id);
-            if (!snackDetail?.snack) {
-                throw new BadRequestError("Snack not exists!!");
+        if (snacks_order) {
+            for (let i = 0; i < snacks_order.length; i++) {
+                const snackDetail = await getSnackDetail(snacks_order[i].snack_id);
+                if (!snackDetail?.snack) {
+                    throw new BadRequestError("Snack not exists!!");
+                }
+            
+                const price = snackDetail.snack.item_price * snacks_order[i].quantity;
+                total_Price.push(price);
+                snacks_order_detail.push({
+                    name: snackDetail.snack.item_name,
+                    quantity: snacks_order[i].quantity,
+                    price: price
+                });
             }
-        
-            const price = snackDetail.snack.item_price * snacks_order[i].quantity;
-            total_Price.push(price);
-            snacks_order_detail.push({
-                name: snackDetail.snack.item_name,
-                quantity: snacks_order[i].quantity,
-                price: price
-            });
         }
+
         console.log("total_Price", total_Price);
 
         let checkoutPrice = total_Price.reduce((acc, item) => {
@@ -143,6 +147,8 @@ class BookingService {
         user_order
     }) { 
         if(!checkoutPrice) throw new NotFoundError("checkout price not exists!!");
+
+        let totalPoint = 0;
     
         const result = await db.sequelize.transaction(async (t) => {
             console.log("newBooking", newBooking);
@@ -154,6 +160,7 @@ class BookingService {
             )
             
             for (let i = 0; i < user_order.length; i++) {
+                totalPoint += 10;
                 let newBookingSeat = await db.booking_seat.create({
                     booking_id: newBooking.id,
                     seat_id: user_order[i].seat_id
@@ -170,6 +177,27 @@ class BookingService {
                 });
 
                 await releaseLock({seatId: user_order[i].seat_id})
+            }
+
+            // increase point user 
+            const updatePointUser = await db.User.increment(
+                { usr_point: totalPoint },
+                { 
+                    where: { id: newBooking.booking_userId },
+                    transaction: t
+                }
+            );
+            if(!updatePointUser) throw new BadRequestError("update point user error!!");
+
+            if (totalPoint >= 20) {
+                try {
+                    await assignDiscountToUser(
+                        "29352d04-ad7f-4ad3-b283-3dd2d4d56ea3",
+                        newBooking.booking_userId
+                    );
+                } catch (err) {
+                    throw new BadRequestError("Assign discount to user error!!");
+                }
             }
             // send mail 
             // send mail to user booking success
@@ -268,6 +296,15 @@ function getSnackDetail(snack_id) {
         snackClient.GetDetailSnack({ id: snack_id }, (err, res) => {
             if (err) reject(err);
             else resolve(res);
+        });
+    });
+}
+
+function assignDiscountToUser(discount_id, user_id) {
+    return new Promise((resolve, reject) => {
+        discountClient.AssignDiscountToUser({ discount_id, user_id }, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
         });
     });
 }

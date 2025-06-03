@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     usr_status: DataTypes.ENUM("active", "block"),
     usr_reset_password_token: DataTypes.TEXT,
     usr_reset_password_expires: DataTypes.BIGINT,
+    usr_point: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'User',

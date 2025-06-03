@@ -60,6 +60,13 @@ class UsersController{
             metadata: await UsersService.getCountUser()
         }).send(res);
     }
+
+    searchUsers = async (req,res,next) => {
+        new SuccessResponse({
+            message: "search users success",
+            metadata: await UsersService.searchUsers(req.query)
+        }).send(res);
+    }
 }
 
 

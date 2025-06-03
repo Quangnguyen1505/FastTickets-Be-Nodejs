@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package payment;
+
+service Greeter {
+  rpc createUrlPaymentMomo (PaymentMomoRequest) returns (PaymentMomoResponse);
+}
+
+message SeatPayload {
+    string seatType = 1;
+    string seatLocation = 2;
+}
+
+message PaymentMomoRequest {
+    string userId = 1;
+    string showtime = 2;
+    string showdate = 3;
+    repeated SeatPayload seatPayload = 4;
+    string movieTitle = 5;
+}
+
+message PaymentMomoResponse {
+    string urlPaymentMomo = 1;
+    int32 code = 2;
+    string message = 3;
+}

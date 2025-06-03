@@ -18,5 +18,6 @@ router.get("", handlerError(UsersController.getUsers));
 router.delete("/:id", handlerError(UsersController.deleteUser));
 router.post("", handlerError(UsersController.addUser));
 router.get("/count", handlerError(UsersController.getCountUser));
+router.get("/search", handlerError(UsersController.searchUsers));
 
 module.exports = router;    

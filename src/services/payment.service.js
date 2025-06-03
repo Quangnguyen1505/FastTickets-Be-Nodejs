@@ -21,7 +21,7 @@ class PaymentService {
     //         }
     //     ]
     // }
-    static async paymentProcessInput({ userId, email, payload }) {
+    static async paymentProcessInput({ userId, email, payload, methodChatbot = false }) {
         const { show_time_id, user_order_book, snacks_order, discount_id = null } = payload;
         console.log("payload", payload)
         const {
@@ -47,7 +47,8 @@ class PaymentService {
                 user_order: user_order_book,
                 snacks_order,
                 discount_id
-            }
+            },
+            methodChatbot
         });
 
         const bookingData  = { 
@@ -82,14 +83,24 @@ class PaymentService {
         '&redirectUrl=' + redirectUrl +
         '&requestId=' + requestId +
         '&requestType=' + requestType;
+        'accessKey=' + accessKey +
+        '&amount=' + amount +
+        '&extraData=' + extraData +
+        '&ipnUrl=' + ipnUrl +
+        '&orderId=' + orderId +
+        '&orderInfo=' + orderInfo +
+        '&partnerCode=' + partnerCode +
+        '&redirectUrl=' + redirectUrl +
+        '&requestId=' + requestId +
+        '&requestType=' + requestType;
         
         //signature
         const signature = crypto
             .createHmac('sha256', secretKey)
             .update(rawSignature)
             .digest('hex');
-        // console.log("signature", signature)
         // console.log("rawSignature", rawSignature)
+        // console.log("signature", signature)
         //json object send to MoMo endpoint
         const requestBody = JSON.stringify({
             partnerCode: partnerCode,
@@ -177,7 +188,7 @@ class PaymentService {
             .createHmac('sha256', secretKey)
             .update(rawSignature)
             .digest('hex');
-    
+
         // console.log("expectedSignature", expectedSignature);
         // console.log("rawSignature", rawSignature);
     
@@ -187,8 +198,23 @@ class PaymentService {
     
         // Rest of the code remains the same...
         const extraDataStr = Buffer.from(extraData, 'base64').toString('utf-8');
-        const { userId, email, checkoutPrice, showtime, user_order, snacks_order, discount_id } = JSON.parse(extraDataStr);
-    
+        const { 
+            userId, 
+            email, 
+            checkoutPrice, 
+            showtime, 
+            user_order 
+        } = JSON.parse(extraDataStr);
+        console.log("extraDataStr", { userId, email, checkoutPrice, showtime, user_order });
+
+        var signaturePayment = crypto
+              .createHmac('sha256', secretKey)
+              .update(rawSignature)
+              .digest('hex');
+        if(signaturePayment !== data.signature) {
+            throw new BadRequestError('Invalid signature!');
+        }
+        
         const checkStatus = await PaymentService.checkStatusPayment({ orderId: data.orderId });
         if (checkStatus.resultCode !== 0) {
             throw new BadRequestError('Payment failed!');
@@ -209,12 +235,8 @@ class PaymentService {
             payment_transaction_id: data.transId,
         });
 
-        if(discount_id) {
-            // update discount grpc
-        }
-    
         const newBooking = await createBooking({ newBooking: newBookingWithPending, email, checkoutPrice, showtime, user_order });
-        return newBooking;
+        return newBooking
     }
 
     static async checkStatusPayment(data) {

@@ -148,7 +148,7 @@ class MovieFactory {
             whereCondition['$movie_categories.cate_id$'] = foundCategory.id;
         }
     
-        return await db.Movie.findAll({
+        const result = await db.Movie.findAndCountAll({
             where: whereCondition,
             limit,
             offset,
@@ -166,6 +166,11 @@ class MovieFactory {
                 }]
             }]
         });
+
+        return {
+            totalCount: result.count,
+            movies: result.rows
+        };
     }
     
 

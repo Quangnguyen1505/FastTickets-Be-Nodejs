@@ -2,7 +2,7 @@ const { BadRequestError, AuthFailureError } = require("../core/error.response");
 const bcrypt = require('bcrypt');
 const { findByEmail, findByUserId, updateUserByUserId, getCountUser } = require("../models/repo/accsess.repo");
 const UploadService = require("./upload.service");
-const { getAllUsers, deleteUserByUserId } = require("../models/repo/users.repo");
+const { getAllUsers, deleteUserByUserId, searchUsers } = require("../models/repo/users.repo");
 const { DestroyCloudinary } = require("../utils");
 const { getRoleByName } = require("./role.service");
 
@@ -95,7 +95,7 @@ class UsersService {
    
 
      static getAllUser = async ({ limit = 30, sort = 'ctime', page = 1 }) => { 
-          const users = await getAllUsers(
+          const {foundUsers, countUser} = await getAllUsers(
                { 
                     limit, 
                     sort, 
@@ -104,7 +104,10 @@ class UsersService {
                }
           );
           
-          return users;
+          return {
+              users: foundUsers,
+              totalCount: countUser
+          };
      }
  
      static deleteUser = async (userId) => {
@@ -127,6 +130,23 @@ class UsersService {
      static getCountUser = async () => {
           const countUser = await getCountUser();
           return countUser;
+     }
+
+     static searchUsers = async ({ search, limit = 30, page = 1, sort = 'ctime' }) => {
+          if (!search) throw new BadRequestError('Keyword is required');
+
+          const { foundUsers, countUser } = await searchUsers({
+               search,
+               limit,
+               page,
+               sort,
+               unselect: ['usr_password']
+          });
+
+          return {
+              users: foundUsers,
+              totalCount: countUser
+          };
      }
 }
 
