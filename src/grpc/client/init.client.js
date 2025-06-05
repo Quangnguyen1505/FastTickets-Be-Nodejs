@@ -1,11 +1,14 @@
 const grpc = require('@grpc/grpc-js');
 const loadProto = require('../loader');
+const config = require("../../config/config");
+
+const { GRPC_HOST } = config;
 
 function getNestedService(obj, path) {
   return path.split('.').reduce((o, k) => (o && o[k] ? o[k] : undefined), obj);
 }
 
-function createGrpcClient(protoFile, servicePath, host = 'localhost:50051') {
+function createGrpcClient(protoFile, servicePath, host = `${GRPC_HOST}`) {
   const proto = loadProto(protoFile);
   const Service = getNestedService(proto, servicePath);
 

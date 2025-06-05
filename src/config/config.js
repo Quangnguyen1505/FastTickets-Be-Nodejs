@@ -1,6 +1,20 @@
 require('dotenv').config();
 
-const { PG_HOST ,PG_USER, PG_PASSWORD, PG_DATABASE, PG_DIALECT, PG_PORT } = process.env;
+const { 
+    PG_HOST,
+    PG_USER, 
+    PG_PASSWORD, 
+    PG_DATABASE, 
+    PG_DIALECT, 
+    PG_PORT,
+    URL_RABBITMQ,
+    URL_HOST_GRPC_SERVER,
+    MOMO_ACCESS_KEY,
+    MOMO_SECRET_KEY,
+    MOMO_PARTNER_CODE,
+    MOMO_REDIRECT_URL,
+    MOMO_IPN_URL
+} = process.env;
 module.exports = {
     development: {
         username: PG_USER,
@@ -12,13 +26,15 @@ module.exports = {
         logging: false,
         timezone: '+07:00',
         role_user: 1,
+        urlRabbitMQ: URL_RABBITMQ,
+        urlHostGrpcServer: URL_HOST_GRPC_SERVER,
         payment: {
-            accessKey: 'F8BBA842ECF85',
-            secretKey: 'K951B6PE1waDMi640xX08PD3vg6EkVlz',
+            accessKey: MOMO_ACCESS_KEY,
+            secretKey: MOMO_SECRET_KEY,
             orderInfo: 'pay with MoMo',
-            partnerCode: 'MOMO',
-            redirectUrl: 'http://localhost:3000/payment-success',
-            ipnUrl: 'https://c50d-2402-800-63b7-fe7f-5f6-f4d5-3cd2-67ba.ngrok-free.app/v1/api/payment/callback', 
+            partnerCode: MOMO_PARTNER_CODE,
+            redirectUrl: MOMO_REDIRECT_URL,
+            ipnUrl: MOMO_IPN_URL,
             requestType: 'payWithMethod',
             extraData: '',
             orderGroupId: '',

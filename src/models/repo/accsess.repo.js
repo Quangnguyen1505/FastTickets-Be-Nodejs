@@ -10,7 +10,7 @@ const findByEmail = async ({ email, select = [
 }
 
 const findByUserId = async ({ userId, select = [
-    "id", "usr_email", "usr_password", "usr_first_name", "usr_last_name", "usr_phone", "usr_address", "usr_avatar_url", "usr_point"
+    "id", "usr_email", "usr_password", "usr_first_name", "usr_last_name", "usr_phone", "usr_address", "usr_avatar_url", "usr_point", "usr_sex", "usr_date_of_birth"
 ]}) => {
     return await db.User.findOne({
         where: {id: userId},

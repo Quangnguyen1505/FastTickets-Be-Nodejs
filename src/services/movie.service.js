@@ -25,6 +25,8 @@ class MovieFactory {
             if (filePathImg) {
                 hasImage = await UploadService.uploadImageFromLocal({ path: filePathImg });
             }
+
+            console.log("hasImage ", hasImage)
         
             const newMovie = await db.Movie.create({ 
                 movie_title, 
@@ -40,7 +42,7 @@ class MovieFactory {
                 movie_release_date,
                 movie_age_rating
             }, { transaction: t });
-        
+            console.log("newMovie", newMovie);
             if (!newMovie) throw new BadRequestError("Create Movie error");
             console.log("movie_category_name", movie_category_name);
             let movieCategoryNameParsed = [];
@@ -49,7 +51,6 @@ class MovieFactory {
             } catch (error) {
                 throw new BadRequestError("Invalid category format");
             }
-            
     
             if (movieCategoryNameParsed && Array.isArray(movieCategoryNameParsed) && movieCategoryNameParsed.length > 0) {
                 const categoryPromises = movieCategoryNameParsed.map(async (category) => {

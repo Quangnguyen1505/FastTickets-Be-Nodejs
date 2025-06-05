@@ -1,12 +1,15 @@
 const amqp = require('amqplib');
+const config = require("../config/config");
 
 let conn = null;
 let channel = null;
 
+const { urlRabbitMQ } = config.development;
+
 const connectToRabbitMQ = async () => {
     try {
         if (conn && channel) return { conn, channel };
-        conn = await amqp.connect('amqp://guest:guest@localhost:5672');
+        conn = await amqp.connect(urlRabbitMQ);
         // const conn = await amqp.connect({
         //     protocol: 'amqp',
         //     hostname: '34.142.197.249',
