@@ -10,43 +10,42 @@ module.exports = {
         autoIncrement: false,
         primaryKey: true,
       },
-      title: {
+      movie_title: {
         type: Sequelize.STRING
       },
-      image: {
+      movie_image_url: {
         type: Sequelize.STRING
       },
-      video_trailer: {
+      movie_video_trailer_code: {
         type: Sequelize.STRING
       },
-      content: {
+      movie_content: {
+        type: Sequelize.TEXT
+      },
+      movie_time: {
+        type: Sequelize.INTEGER
+      },
+      movie_director: {
         type: Sequelize.STRING
       },
-      time: {
+      movie_performer: {
         type: Sequelize.STRING
       },
-      director: {
-        type: Sequelize.STRING
-      },
-      performer: {
-        type: Sequelize.STRING
-      },
-      price: {
-        type: Sequelize.STRING
-      },
-      movie_categoryId: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'categories',
-          key: 'id'
-        }
+      movie_price: {
+        type: Sequelize.INTEGER
       },
       movie_status: {
-        type: Sequelize.ENUM("dangchieu", "sapchieu", "dachieu"),
-        defaultValue: "dangchieu"
+        type: Sequelize.ENUM("now-showing", "upcoming-movies", "past-movies"),
+        defaultValue: "upcoming-movies"
       },
-      country: {
+      movie_country: {
         type: Sequelize.STRING
+      },
+      movie_age_rating: {
+        type: Sequelize.ENUM("K", "T13", "T16", "T18")
+      },
+      movie_release_date: {
+        type: Sequelize.DATEONLY
       },
       createdAt: {
         allowNull: false,
@@ -58,7 +57,7 @@ module.exports = {
       }
     });
     //define index
-    await queryInterface.addIndex('Movies', ['title']);
+    await queryInterface.addIndex('Movies', ['movie_title']);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Movies');

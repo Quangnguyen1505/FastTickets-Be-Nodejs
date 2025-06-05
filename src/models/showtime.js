@@ -11,12 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Showtime.hasMany(models.showtime_pricing, { foreignKey: 'show_time_id' });
+      Showtime.belongsTo(models.Movie, { foreignKey: 'movie_id' });
+      Showtime.hasMany(models.Booking, { foreignKey: 'booking_show_time_id' });
+      Showtime.belongsTo(models.Room, { foreignKey: 'room_id' });
+      Showtime.hasMany(models.seat_status, { foreignKey: 'showtime_id' });
     }
   }
   Showtime.init({
+    show_date: DataTypes.DATE,
     start_time: DataTypes.DATE,
+    end_time: DataTypes.DATE,
     movie_id: DataTypes.UUID,
-    room_id: DataTypes.UUID
+    room_id: DataTypes.UUID,
+    status: DataTypes.ENUM('active', 'block')
   }, {
     sequelize,
     modelName: 'Showtime',

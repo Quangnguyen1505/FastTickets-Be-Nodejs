@@ -3,10 +3,12 @@ const { BadRequestError } = require('../core/error.response');
 
 class UploadService {
     static async uploadImageFromLocal ({ path, folderName = 'Cinema/movies' }) {
+        console.log("file path", path)
         const result = await cloudinary.uploader.upload(path, {
             public_id: `${Date.now()}`,
             folder: folderName
         });
+        console.log("result", result)
         if(!result) throw new BadRequestError('Upload failed');
 
         return {

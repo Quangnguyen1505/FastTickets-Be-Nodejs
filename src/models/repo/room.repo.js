@@ -1,13 +1,26 @@
 const db = require('..');
 
-const foundRoomById = async ( roomId ) => {
+const foundRoomById = async ({roomId, t = null}) => {
     const foundRoom = await db.Room.findOne({
         where: {id: roomId},
         include: [{
-            model: db.Movie,
-            as: 'Movie', 
-            attributes: ['title', 'movie_status']
+            model: db.Room_seat_type,
+            as: 'Room_seat_types', 
+            attributes: ['seat_type_id', 'quantity'],
+            include: [
+                {
+                    model: db.Seat_type,
+                    as: 'Seat_type',
+                    attributes: ['name'] 
+                }
+            ]
+        }, {
+            
+            model: db.Seat,
+            as: 'Seats',
+            attributes: ['seat_row', 'seat_number'] 
         }],
+        transaction: t
     });
 
     return foundRoom;
@@ -20,7 +33,19 @@ const foundAllRoom = async ({ limit, sort, page, unselect }) => {
         attributes: {exclude: unselect},
         limit,
         sort: sortBy,
-        skip
+        skip,
+        include: [{
+            model: db.Room_seat_type,
+            as: 'Room_seat_types', 
+            attributes: ['seat_type_id', 'quantity'],
+            include: [
+                {
+                    model: db.Seat_type,
+                    as: 'Seat_type',
+                    attributes: ['name'] 
+                }
+            ]
+        }],
     });
 
     return foundRoom;

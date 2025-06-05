@@ -2,11 +2,12 @@ const { BadRequestError } = require('../../core/error.response');
 const db = require('../../models');
 const { Op } = require('sequelize');
 
-const foundMovieById = async ( movieId ) => {
+const foundMovieById = async ({movieId, t = null}) => {
     const foundMovie = await db.Movie.findOne({
         where: {
             id: movieId
-        }
+        },
+        transaction: t
     })
 
     return foundMovie
@@ -15,7 +16,7 @@ const foundMovieById = async ( movieId ) => {
 const foundMovieByName = async ( movie_title ) => {
     const foundMovie = await db.Movie.findOne({
         where: {
-            title: movie_title
+            movie_title
         }
     })
 

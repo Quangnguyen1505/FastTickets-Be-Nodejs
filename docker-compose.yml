@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres_container_nodejs
+    environment:
+      POSTGRES_USER: "postgres" 
+      POSTGRES_PASSWORD: "123456789@"
+      POSTGRES_DB: "fasttickets-db" 
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+  # app:
+  #   container_name: go_backend_crm_shopdev
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8081:8081"
+  #   networks:
+  #     - mynetwork
+  #   depends_on: # postgres and redis start before app
+  #     - postgres
+  #     - redis
+volumes:
+  postgres_data:
+  redis_data:
+networks:
+  mynetwork:
+    driver: bridge

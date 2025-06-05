@@ -11,19 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Room.belongsTo(models.Movie, { foreignKey: 'room_currently_showing' });
+      Room.hasMany(models.Room_seat_type, { foreignKey: 'room_id' });
+      Room.hasMany(models.Booking, { foreignKey: 'booking_roomId' });
+      Room.hasMany(models.Showtime, { foreignKey: 'room_id' });
+      Room.hasMany(models.Seat, { foreignKey: 'seat_roomId' });
     }
   }
   Room.init({
     room_name: DataTypes.STRING,
     room_seat_quantity: DataTypes.INTEGER,
-    room_seat_type: DataTypes.ARRAY(DataTypes.STRING),
     room_status: DataTypes.BOOLEAN,
-    room_currently_showing: DataTypes.UUID,
-    room_price_currently_showing: DataTypes.ARRAY(DataTypes.JSON),
-    room_previously_shown: DataTypes.ARRAY(DataTypes.JSON),
     room_release_date: DataTypes.DATE,
-    room_show_times: DataTypes.ARRAY(DataTypes.DATE)
   }, {
     sequelize,
     modelName: 'Room',

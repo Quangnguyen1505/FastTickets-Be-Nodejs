@@ -10,16 +10,32 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // Định nghĩa các mối quan hệ ở đây
+      User.hasMany(models.keyToken, { foreignKey: 'user_id' });
+      // User.hasMany(models.Event, { foreignKey: 'userId' });
+      User.belongsTo(models.Role, { foreignKey: 'usr_role_id' });
+      User.hasMany(models.Booking, { foreignKey: 'booking_userId' });
     }
   }
   User.init({
-    name: DataTypes.STRING,
-    avatar: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    address: DataTypes.STRING,
-    role: DataTypes.INTEGER,
+    usr_slug: DataTypes.STRING,
+    usr_first_name: DataTypes.STRING,
+    usr_last_name: DataTypes.STRING,
+    usr_password: DataTypes.STRING,
+    usr_salf: DataTypes.INTEGER,
+    usr_email: DataTypes.STRING,
+    usr_phone: DataTypes.STRING,
+    usr_sex: DataTypes.INTEGER,
+    usr_avatar_url: DataTypes.STRING,
+    usr_date_of_birth: DataTypes.DATE,
+    usr_address: DataTypes.STRING,
+    user_oauth_provider: DataTypes.ENUM('google', 'facebook'),
+    user_oauth_provider_id: DataTypes.STRING,
+    usr_role_id: DataTypes.INTEGER,
+    usr_status: DataTypes.ENUM("active", "block"),
+    usr_reset_password_token: DataTypes.TEXT,
+    usr_reset_password_expires: DataTypes.BIGINT,
+    usr_point: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'User',
