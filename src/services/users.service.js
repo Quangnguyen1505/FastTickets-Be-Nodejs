@@ -8,9 +8,21 @@ const { getRoleByName } = require("./role.service");
 
 class UsersService {
    static getProfile = async ( userId )=>{
-        console.log("userid", userId);
-        
-        const foundUser = await findByUserId({userId});
+        const foundUser = await findByUserId({
+          userId, 
+          select: [
+               'id',
+               'usr_first_name', 
+               'usr_last_name', 
+               'usr_email', 
+               'usr_phone', 
+               'usr_avatar_url', 
+               'usr_date_of_birth', 
+               'usr_address',
+               'usr_point',
+               'usr_sex'
+          ]
+        });
         if(!foundUser) throw new BadRequestError('User is not registered');
         return foundUser;
    }
