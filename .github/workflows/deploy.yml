@@ -1,4 +1,4 @@
-name: CI/CD for Nextjs with Docker Compose
+name: CI/CD for Nodejs Servier Core with Docker Compose
 
 on:
   push:
