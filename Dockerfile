@@ -1,0 +1,19 @@
+FROM node:alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+RUN npm install -g pkg
+
+COPY . .
+RUN pkg --targets node18-linux-x64 server.js -o app
+
+# Minimal runtime
+FROM alpine:latest
+
+WORKDIR /app
+COPY --from=builder /app/app .
+
+EXPOSE 3000
+CMD ["./app"]

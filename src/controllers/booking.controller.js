@@ -42,6 +42,13 @@ class BookingController{
             metadata: await bookingService.getBookingByUserId(req.userId, req.query)
         }).send(res);
     }
+
+    updateStatusBooking = async ( req, res, next ) => {
+        new SuccessResponse({
+            message: "update Booking status success",
+            metadata: await bookingService.updateStatusBooking(req.params.id, req.body)
+        }).send(res);
+    }
 }
 
 module.exports = new BookingController();
