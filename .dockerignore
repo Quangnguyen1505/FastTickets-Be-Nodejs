@@ -1,0 +1,10 @@
+node_modules
+sequelize-cli.txt
+swagger
+Dockerfile
+.dockerignore
+.env
+*.md
+.gitignore
+note.config.txt
+.idea

@@ -288,7 +288,21 @@ class BookingService {
 
         return foundbooking;
     }
-    
+
+    static async updateStatusBooking( bookingId ) {
+        const foundbooking = await foundBookingById(bookingId);
+        if(!foundbooking) throw new BadRequestError("Booking not exitst!!");
+        if (foundbooking.booking_status === 'completed') {
+           return foundbooking;
+        }
+        const updatedBooking = await foundbooking.update(
+            { booking_status: 'completed' },
+            { where: { id: bookingId } }
+        );
+        if (!updatedBooking) throw new BadRequestError("Update booking status error!!");
+        return foundbooking;
+    }
+
 }
 
 function getSnackDetail(snack_id) {

@@ -26,11 +26,9 @@ class ShowTimeService {
         
         const result = await db.sequelize.transaction(async (t) => {
             const hasMovie = await foundMovieById({movieId: movie_id, t});
-            console.log("1")
             if (!hasMovie) throw new BadRequestError('Movie not found');
 
             const hasRoom = await foundRoomById({roomId: room_id, t});
-            console.log("2")
             if (!hasRoom) throw new BadRequestError('Room not found');
 
             const convert_start_time = db.Sequelize.literal(`TIME '${start_time}'`);
@@ -43,7 +41,6 @@ class ShowTimeService {
                 end_time: convert_end_time,
                 t
             });
-            console.log("3")
             if (hasShowTime) throw new BadRequestError('Showtime conflicts with another showtime in the same room');
 
             const newShowTime = await db.Showtime.create({
@@ -53,9 +50,7 @@ class ShowTimeService {
                 movie_id,
                 room_id,
             }, { transaction: t });
-            console.log("4")
             if(!newShowTime) throw new BadRequestError("error create show time");
-            console.log(hasRoom)
             for (let i = 0; i < surcharge_seat.length; i++) {
                 if(hasRoom.Room_seat_types[i].Seat_type.name == surcharge_seat[i].name_type){
                     const newPayload = {

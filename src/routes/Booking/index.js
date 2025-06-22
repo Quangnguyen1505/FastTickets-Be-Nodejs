@@ -11,6 +11,7 @@ router.get("/:id", handlerError(bookingController.getBookingById));
 router.use(authencationV2);
 router.get("/history/users", handlerError(bookingController.getBookingsByUserId));
 router.post("",  handlerError(bookingController.createBooking));
+router.put("/:id", handlerError(bookingController.updateStatusBooking));
 
 router.use(checkAdmin);
 router.get("", handlerError(bookingController.getAllBooking));

@@ -31,13 +31,15 @@ const handleEventConnection = ({
 const init = ({
     IOREDIS_IS_ENABLED,
     IOREDIS_HOST = process.env.REDIS_CACHE_HOST,
-    IOREDIS_PORT = process.env.REDIS_PORT
+    IOREDIS_PORT = process.env.REDIS_PORT,
+    IOREDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined
 }) => {
     if(IOREDIS_IS_ENABLED){
         if(!clients.instanceConnect){
             const instanceRedis = new Redis({
                 host: IOREDIS_HOST,
-                port: IOREDIS_PORT
+                port: IOREDIS_PORT,
+                password: IOREDIS_PASSWORD
             })
             clients.instanceConnect = instanceRedis;
             handleEventConnection({
