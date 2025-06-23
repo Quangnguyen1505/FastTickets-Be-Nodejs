@@ -3,8 +3,13 @@ sequelize-cli.txt
 swagger
 Dockerfile
 .dockerignore
-.env
 *.md
 .gitignore
 note.config.txt
 .idea
+.git
+/src/uploads
+/src/postman
+logs
+nodemon.json
+*.log
