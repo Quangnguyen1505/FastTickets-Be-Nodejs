@@ -1,4 +1,3 @@
-// src/grpc/startGrpcServer.js
 const grpc = require('@grpc/grpc-js');
 const loadProto = require('./loader');
 const uploadService = require('./services/upload.grpc');

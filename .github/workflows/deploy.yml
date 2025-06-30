@@ -31,6 +31,7 @@ jobs:
           DEPLOY_DIR=/home/github-runner/deploy/
           rm -rf $DEPLOY_DIR
           mkdir -p $DEPLOY_DIR
+          mkdir -p $DEPLOY_DIR/src/uploads
           cp -r . $DEPLOY_DIR
           pwd
           ls -l
