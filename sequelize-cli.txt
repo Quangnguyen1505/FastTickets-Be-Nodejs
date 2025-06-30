@@ -3,7 +3,11 @@ npx sequelize-cli model:generate --name User --attributes firstName:string,lastN
 
 npx sequelize-cli seed:generate --name insert-default-categories
 
-
+//xoa
+Rollback tất cả migrations:
+npx sequelize-cli db:migrate:undo:all
+(Optional) Seed undo nếu đã chạy seeders:
+npx sequelize-cli db:seed:undo:all
 
 docker build --platform=linux/amd64 -t node-app:phase6 . -f Dockerfile.phase6
 docker run --platform=linux/amd64 -d -p 3000:3000 node-app:phase6

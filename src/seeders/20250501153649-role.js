@@ -34,7 +34,6 @@ module.exports = {
       .filter(r => !existingSlugs.includes(r.role_slug))
       .map(r => ({
         ...r,
-        id: Sequelize.literal('gen_random_uuid()'),
         createdAt: new Date(),
         updatedAt: new Date(),
       }));
