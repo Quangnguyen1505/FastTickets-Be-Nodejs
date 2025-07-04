@@ -26,10 +26,7 @@ passport.use(new FacebookStrategy({
       where: { user_oauth_provider_id: profile.id },
       defaults: {
         id: uuidv4(),
-        // usr_email: profile.emails[0]?.value,
-        // usr_first_name: profile?.name.familyName,
         usr_last_name: profile?.displayName,
-        // usr_avatar_url: profile?.photos[0]?.value,
         usr_password,
         usr_role_id: foundRole.id,
         user_oauth_provider: profile.provider,

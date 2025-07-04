@@ -14,7 +14,10 @@ const {
     MOMO_SECRET_KEY,
     MOMO_PARTNER_CODE,
     MOMO_REDIRECT_URL,
-    MOMO_IPN_URL
+    MOMO_IPN_URL,
+    VNPAY_SECURE_SECRET,
+    VNPAY_TMN_CODE,
+    VNPAY_IP_ADDR,
 } = process.env;
 module.exports = {
     development: {
@@ -44,8 +47,8 @@ module.exports = {
             lang: 'vi',
         },
         paymentVnpay: {
-            tmnCode: 'OZER7XG4',
-            secureSecret: 'P3N8MRKTDWVVPMJWKDZYRIXDPK9DQ8BI',
+            tmnCode: VNPAY_TMN_CODE,
+            secureSecret: VNPAY_SECURE_SECRET,
             vnpayHost: 'https://sandbox.vnpayment.vn',
             queryDrAndRefundHost: 'https://sandbox.vnpayment.vn',
             hashAlgorithm: 'SHA512',
@@ -54,7 +57,7 @@ module.exports = {
                 queryDrRefundEndpoint: 'merchant_webapi/api/transaction', // Endpoint tra cứu & hoàn tiền
                 getBankListEndpoint: 'qrpayauth/api/merchant/get_bank_list', // Endpoint lấy danh sách ngân hàng
             },
-            vnp_IpAddr: '127.0.0.1',
+            vnp_IpAddr: VNPAY_IP_ADDR,
         }
     }
 }
