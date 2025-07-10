@@ -18,9 +18,11 @@ const {
     VNPAY_SECURE_SECRET,
     VNPAY_TMN_CODE,
     VNPAY_IP_ADDR,
+    URL_SERVER,
 } = process.env;
 module.exports = {
     development: {
+        url_server: URL_SERVER,
         username: PG_USER,
         password: PG_PASSWORD,
         database: PG_DATABASE,

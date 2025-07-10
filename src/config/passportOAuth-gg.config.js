@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require ('uuid');
 const { getRoleByName } = require('../services/role.service');
 const { BadRequestError } = require('../core/error.response');
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, URL_SERVER } = process.env;
 const Role = {
   USER:'User',
 }
@@ -13,7 +13,7 @@ const Role = {
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "/v1/api/oauth/google/callback"
+    callbackURL: `${URL_SERVER}/v1/api/oauth/google/callback`
   },
   async function(accessToken, refreshToken, profile, cb) {
     console.log("profile", profile);
