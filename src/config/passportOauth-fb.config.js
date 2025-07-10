@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require ('uuid');
 const { getRoleByName } = require('../services/role.service');
 const { BadRequestError } = require('../core/error.response');
 
-const { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = process.env;
+const { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, URL_SERVER } = process.env;
 const Role = {
   USER:'User',
 }
@@ -13,7 +13,7 @@ const Role = {
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "/v1/api/oauth/facebook/callback"
+    callbackURL: `${URL_SERVER}/v1/api/oauth/facebook/callback`
   },
   async function(accessToken, refreshToken, profile, cb) {
     console.log("profile fb ", profile);
