@@ -93,28 +93,35 @@ class ShowTimeService {
         
         return foundShowTime
     }
-    
+
     static async deleteShowTime(showtime_id) {
-        const foundShowTime = await findShowTimeById({showtime_id});
+        const foundShowTime = await findShowTimeById({ showtime_id });
         if (!foundShowTime) throw new BadRequestError('Showtime not found');
-    
+
         const result = await db.sequelize.transaction(async (t) => {
+            // Xoá seat_statuses trước
+            await db.seat_status.destroy({
+                where: { showtime_id },
+                transaction: t
+            });
+
+            // Xoá showtime_pricing
             await db.showtime_pricing.destroy({
                 where: { show_time_id: showtime_id },
                 transaction: t
             });
-        
-            // Xoá showtime
+
+            // Xoá chính Showtime
             const deleteShowTime = await db.Showtime.destroy({
                 where: { id: showtime_id },
                 transaction: t
             });
-        
+
             if (!deleteShowTime) throw new BadRequestError('Delete failed');
-        
-            return deleteShowTime
-        })
-        
+
+            return deleteShowTime;
+        });
+
         return result;
     }
     
