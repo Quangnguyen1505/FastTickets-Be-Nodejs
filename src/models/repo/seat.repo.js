@@ -39,19 +39,30 @@ const findSeatByCode = async (seatCode, seat_status, showtime_id) => {
   
     const seat_row = match[1].toUpperCase(); // Chuyển về in hoa nếu cần
     const seat_number = parseInt(match[2], 10);
+
+    const foundShowtime = await db.Showtime.findOne({
+        where: { id: showtime_id },
+        attributes: ['room_id']
+    });
+    if (!foundShowtime) throw new BadRequestError("Showtime not found");
   
     // Tìm trong DB
     const foundSeat = await db.Seat.findOne({
       where: {
         seat_row,
-        seat_number
+        seat_number,
+        seat_roomId: foundShowtime.room_id
       }
     });
 
     if (!foundSeat) throw new BadRequestError("Seat not exists!!");
 
     const foundSeatStatus = await db.seat_status.findOne({
-      where: { seat_id: foundSeat.id, status: seat_status, showtime_id: showtime_id }
+      where: { 
+        seat_id: foundSeat.id, 
+        status: seat_status, 
+        showtime_id: showtime_id 
+      }
     });
 
     return foundSeatStatus;
