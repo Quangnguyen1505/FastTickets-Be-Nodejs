@@ -79,7 +79,7 @@ class PaymentVNPayService {
                 vnp_TxnRef: newBookingWithPending.id,
                 vnp_OrderInfo: `${extraData}`,
                 vnp_OrderType: ProductCode.Other,
-                vnp_ReturnUrl: `${config.development.url_server}/payment-success`,
+                vnp_ReturnUrl: `${process.env.URL_CLIENT}/payment-success`,
                 vnp_Locale: VnpLocale.VN,
                 vnp_CreateDate: dateFormat(new Date()),
                 vnp_ExpireDate: dateFormat(tomorrow)
